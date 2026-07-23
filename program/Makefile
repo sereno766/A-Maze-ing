@@ -1,5 +1,5 @@
 NAME		=	"A-Maze-ing"
-PY			=	.venv/bin/python
+PY			=	venv/bin/python
 RM			=	rm -rf
 FK			=	flake8
 MP			=	mypy
