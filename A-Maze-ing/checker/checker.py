@@ -1,2 +1,0 @@
-def checker():
-    print("checker")

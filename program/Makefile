@@ -1,4 +1,5 @@
 NAME		=	"A-Maze-ing"
+# PY			=	.venv/bin/python
 PY			=	python
 RM			=	rm -rf
 FK			=	flake8
@@ -24,7 +25,7 @@ config:
 install:
 
 run:
-	$(PY) main/main.py
+	$(PY) -m a_maze_ing
 
 debug:
 
@@ -36,19 +37,19 @@ lint-strict:
 	@$(FK) .
 	@$(MP) --strict .
 
-init_venv:
+init-venv:
 	@python -m venv venv --copies
 
-atvvenv:
+atv-venv:
 	@echo "source venv/bin/activate"
 
 depend:
 	@pip install -r requirements.txt
 
-remove_venv:
+remove-venv:
 	$(RM) venv/
 
 clean:
 	@find . -name "__pycache__" -type d -exec $(RM) {} +
 
-fclean: clean remove_venv
+fclean: clean remove-venv
