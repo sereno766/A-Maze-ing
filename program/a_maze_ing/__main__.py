@@ -1,12 +1,8 @@
-from a_maze_ing import checker, clear, RED, DEFAULT
-import cowsay
+from program.a_maze_ing.src.a_maze_ing import a_maze_ing
 
 
 def main() -> int:
-    clear()
-    print(RED, "HELLO", DEFAULT)
-    checker()
-    cowsay.cow("That is A... Maze.. ing")
+    a_maze_ing()
     return 0
 
 
