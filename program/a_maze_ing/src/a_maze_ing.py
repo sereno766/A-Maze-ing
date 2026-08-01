@@ -30,7 +30,8 @@ def config_file(path: str) -> Path:
     file = Path(path)
 
     if file.suffix != ".txt":
-        raise argparse.ArgumentTypeError("Configuration file must be a .txt extension")
+        raise argparse.ArgumentTypeError(
+            "Configuration file must be a .txt extension")
     if not file.is_file():
         raise argparse.ArgumentTypeError(f"{file} not found in path!")
     return file
@@ -73,7 +74,7 @@ def parser_file(fpath: Path) -> Settings:
 
 def a_maze_ing() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("config", nargs="?", type=config_file,
+    parser.add_argument("-c", "--config", nargs="?", type=config_file,
                         help="Maze configuration file")
 
     args = parser.parse_args()
