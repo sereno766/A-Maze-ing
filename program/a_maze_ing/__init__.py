@@ -1,12 +1,15 @@
 # mypy: ignore-errors
-from .includes.clear import clear
-from .checker.checker import checker
-from .includes.colors import (DEFAULT, RED, GREEN, YLOW, PINK,
-                              CYAN, INVERT, BOLD)
-from .src.a_maze_ing import a_maze_ing
+from a_maze_ing.checker.checker import checker
+from a_maze_ing.includes.includes import (clear, DEFAULT, RED, GREEN,
+                                          YLOW, PINK, CYAN, INVERT, BOLD)
+from a_maze_ing.parser.parser import parser_file, config_file, Settings
+from a_maze_ing.seed.seed import validate_seed
+from a_maze_ing.runner.runner import runner
 
 __all__ = [
     "clear", "checker",
     "DEFAULT", "RED", "GREEN", "YLOW", "PINK", "CYAN", "INVERT", "BOLD",
-    "a_maze_ing",
+    "parser_file", "config_file", "Settings",
+    "validate_seed",
+    "runner"
 ]

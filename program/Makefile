@@ -24,7 +24,7 @@ config:
 install:
 
 run:
-	$(PY) -m program/a_maze_ing
+	$(PY) -m a_maze_ing
 
 debug:
 
@@ -50,5 +50,6 @@ remove-venv:
 
 clean:
 	@find . -name "__pycache__" -type d -exec $(RM) {} +
+	$(RM) .mypy_cache
 
 fclean: clean remove-venv

@@ -2,10 +2,20 @@ import argparse
 from pathlib import Path
 from dataclasses import dataclass
 from typing import cast
+from a_maze_ing.seed.seed import validate_seed
+
 
 def parse_coord(value: str) -> tuple[int, int]:
     x, y = value.split(",", 1)
     return int(x), int(y)
+
+
+def parser_seed(value: str = "") -> str:
+    # print("value received:", value)
+    if value == "":
+        return "not-setted"
+    return value.replace('"', '')
+
 
 PARSER = {
     "WIDTH": int,
@@ -13,8 +23,10 @@ PARSER = {
     "ENTRY": parse_coord,
     "EXIT": parse_coord,
     "OUTPUT_FILE": str,
-    "PERFECT": lambda s: s == "True",
+    "SEED": parser_seed,
+    "PERFECT": lambda s: s == "True"
 }
+
 
 @dataclass
 class Settings:
@@ -23,6 +35,7 @@ class Settings:
     entry: tuple[int, int]
     exit: tuple[int, int]
     output: str
+    seed: str
     perfect: bool
 
 
@@ -49,14 +62,21 @@ def parser_settings(path: Path) -> dict[str, object]:
             key, value = line.split("=", 1)
             if key not in PARSER:
                 raise ValueError(f"Unknown setting '{key}'")
+            # print(f"key: {key}, value: {value}")
             settings[key] = PARSER[key](value)
+        if "SEED" not in settings:
+            settings["SEED"] = PARSER["SEED"]("")
     return settings
 
 
 def validate_settings(settings: dict) -> None:
+    # print(settings.keys())
     missing = PARSER.keys() - settings.keys()
     if missing:
         raise ValueError(f"Missing settings: {', '.join(sorted(missing))}")
+    seed = settings.get("SEED")
+    if not validate_seed(seed):
+        raise ValueError(f"Seed '{settings.get("seed")}' is not valid, try to run `python -m seed_generator` for a valid seed")
 
 
 def parser_file(fpath: Path) -> Settings:
@@ -68,20 +88,6 @@ def parser_file(fpath: Path) -> Settings:
         entry=cast(tuple[int, int], settings["ENTRY"]),
         exit=cast(tuple[int, int], settings["EXIT"]),
         output=cast(str, settings["OUTPUT_FILE"]),
+        seed=cast(str, settings["SEED"]),
         perfect=cast(bool, settings["PERFECT"])
     )
-
-
-def a_maze_ing() -> int:
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-c", "--config", nargs="?", type=config_file,
-                        help="Maze configuration file")
-
-    args = parser.parse_args()
-
-    if args.config is not None:
-        settings = parser_file(args.config)
-        print(f"settings: {settings}")
-    return 0
-
-a_maze_ing()
