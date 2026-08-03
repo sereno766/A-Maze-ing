@@ -5,7 +5,7 @@ def validate_seed(seed: str) -> bool:
         return False
     if not seed.isalnum():
         return False
-    if not (4 <= len(seed) <= 64)
+    if not (4 <= len(seed) <= 64):
         return False
     return True
 
