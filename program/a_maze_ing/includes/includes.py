@@ -1,3 +1,5 @@
+from random import shuffle, sample
+from string import ascii_letters, digits
 from time import sleep
 import subprocess
 import os
@@ -39,3 +41,66 @@ def clear(init_wait_time: int = 0, final_wait_time: int = 0) -> None:
     sleep(float(init_wait_time))
     subprocess.run(cmd)
     sleep(float(final_wait_time))
+
+def gen_chars(amount: int = 10) -> str:
+    chars = ascii_letters + digits
+    return "".join(sample(chars, amount))
+
+def gen_nbr(amount: int = 2) -> str:
+    return "".join(sample(digits, amount))
+
+
+def there_is_alpha(text: str) -> bool:
+    """
+    Check whether a string contains at least one alphabetic character.
+
+    Alphabetic characters are determined using ``str.isalpha()``.
+
+    :param text: The text to be analyzed.
+    :type text: str
+    :return: True if at least one alphabetic character is found,
+             False otherwise.
+    :rtype: bool
+    """
+    for c in text:
+        if str(c).isalpha():
+            return True
+        else:
+            pass
+    return False
+
+
+def split_by(text: str, chunk_len: int = 0, chunk: int = 2) -> list:
+    """
+    Split a string into chunks of a fixed size.
+
+    The function iterates through the string and splits it into
+    substrings containing ``chunk_len`` characters each.
+
+    :param text: The text to be split.
+    :type text: str
+    :param chunk_len: Number of characters per chunk.
+    :type chunk_len: int
+    :param chunk: number of chunks to return.
+    :type chunk: int
+    :return: A list of substrings split by the specified size.
+    :rtype: list
+    """
+    if chunk_len == 0:
+        chunk_len = int(len(text) / chunk)
+    cnt = 0
+    ret = []
+    i = 0
+    e = chunk_len
+    while cnt != chunk:
+        if text[i:e] == "":
+            break
+        splited_by = text[i:e]
+        i = e
+        e += chunk_len
+        if there_is_alpha(splited_by):
+            ret.append(splited_by)
+        else:
+            ret.append(int(splited_by))
+        cnt += 1
+    return ret

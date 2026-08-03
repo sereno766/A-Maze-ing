@@ -1,4 +1,4 @@
-from a_maze_ing import runner, config_file, RED, DEFAULT
+from a_maze_ing import runner, config_file, RED, DEFAULT, gen_chars, gen_nbr, agc, gen_seed
 import argparse
 
 
@@ -20,4 +20,8 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    main()
+    # main()
+    # print(gen_chars(50))
+    # print(gen_nbr(3))
+    print(agc())
+    # gen_seed()

@@ -2,7 +2,7 @@ import argparse
 from pathlib import Path
 from dataclasses import dataclass
 from typing import cast
-from a_maze_ing.seed.seed import validate_seed
+from a_maze_ing.seed.seed import validate_seed, gen_seed
 
 
 def parse_coord(value: str) -> tuple[int, int]:
@@ -76,7 +76,16 @@ def validate_settings(settings: dict) -> None:
         raise ValueError(f"Missing settings: {', '.join(sorted(missing))}")
     seed = settings.get("SEED")
     if not validate_seed(seed):
-        raise ValueError(f"Seed '{settings.get("seed")}' is not valid, try to run `python -m seed_generator` for a valid seed")
+        raise ValueError(f"Seed '{settings.get("seed")}'",
+                         "is not valid, try to run `python -m",
+                         "seed_generator` for a valid seed")
+    if seed == "not-setted":
+        generated_seed = gen_seed(
+            settings.get("ENTRY"),
+            settings.get("EXIT"),
+            settings.get("WIDTH"),
+            settings.get("HEIGHT")
+        )
 
 
 def parser_file(fpath: Path) -> Settings:
