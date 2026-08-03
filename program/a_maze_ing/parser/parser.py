@@ -70,23 +70,24 @@ def parser_settings(path: Path) -> dict[str, object]:
 
 
 def validate_settings(settings: dict) -> None:
-    # print(settings.keys())
     missing = PARSER.keys() - settings.keys()
     if missing:
         raise ValueError(f"Missing settings: {', '.join(sorted(missing))}")
+
     seed = settings.get("SEED")
-    if not validate_seed(seed):
-        raise ValueError(f"Seed '{settings.get("seed")}'",
-                         "is not valid, try to run `python -m",
-                         "seed_generator` for a valid seed")
+
     if seed == "not-setted":
-        generated_seed = gen_seed(
+        settings["SEED"] = gen_seed(
             settings.get("ENTRY"),
             settings.get("EXIT"),
             settings.get("WIDTH"),
             settings.get("HEIGHT")
         )
-
+    elif not validate_seed(seed):
+        raise ValueError(
+            f"Seed '{seed}' is not valid, try to run "
+            f"`python -m seed_generator` for a valid seed"
+        )
 
 def parser_file(fpath: Path) -> Settings:
     settings = parser_settings(fpath)
