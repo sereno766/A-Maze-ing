@@ -1,4 +1,5 @@
 from a_maze_ing import runner, config_file, RED, DEFAULT, gen_chars, gen_nbr, agc, gen_seed
+from a_maze_ing.src.gerete_maze import MazeGenerator
 import argparse
 
 
@@ -11,7 +12,9 @@ def main() -> int:
 
     try:
         settings = runner(fpath=args.config)
-        print(f"settings: {settings}")
+        print(f"settings: {settings}\n\n\n\n")
+        maze = MazeGenerator(settings)
+        maze.debug_print()
     except Exception as e:
         print(f"{RED}Error: {e}{DEFAULT}")
         return 1
