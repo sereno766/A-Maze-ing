@@ -1,4 +1,4 @@
-from a_maze_ing import Settings
+from a_maze_ing.parser.parser import Settings
 
 
 class MazeGenerator:

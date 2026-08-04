@@ -3,6 +3,7 @@ from pathlib import Path
 from dataclasses import dataclass
 from typing import cast
 from a_maze_ing.seed.seed import validate_seed, gen_seed
+from a_maze_ing.includes.includes import gen_nbr, split_by
 
 
 def parse_coord(value: str) -> tuple[int, int]:
@@ -37,6 +38,37 @@ class Settings:
     output: str
     seed: str
     perfect: bool
+
+
+def gen_size(min: int, max: int) -> int:
+    size = int(gen_nbr(2))
+    while size > max or size <= min:
+        size = int(gen_nbr(2))
+    return size
+
+
+def agc() -> dict:
+    width = gen_size(min=15, max=25)
+    height = gen_size(min=15, max=20)
+    entry = split_by(gen_nbr(2), 1, 2)
+    exit = split_by(gen_nbr(4), 0, 2)
+    valid = False
+    while valid == False:
+        if ((int(exit[0]) >= width or int(exit[0]) >= height)
+           or (int(exit[1]) >= width or int(exit[1]) >= height)):
+            exit = split_by(gen_nbr(4), 0, 2)
+        else:
+            valid = True
+    seed = gen_seed(20)
+    return dict(
+        WIDTH=width,
+        HEIGHT=height,
+        ENTRY=entry,
+        EXIT=exit,
+        OUTPUT_FILE="maze.txt",
+        SEED=seed,
+        PERFECT=True
+    )
 
 
 def config_file(path: str) -> Path:
@@ -77,20 +109,18 @@ def validate_settings(settings: dict) -> None:
     seed = settings.get("SEED")
 
     if seed == "not-setted":
-        settings["SEED"] = gen_seed(
-            settings.get("ENTRY"),
-            settings.get("EXIT"),
-            settings.get("WIDTH"),
-            settings.get("HEIGHT")
-        )
+        settings["SEED"] = gen_seed(20)
     elif not validate_seed(seed):
         raise ValueError(
             f"Seed '{seed}' is not valid, try to run "
             f"`python -m seed_generator` for a valid seed"
         )
 
-def parser_file(fpath: Path) -> Settings:
-    settings = parser_settings(fpath)
+def parser_file(fpath: Path = None) -> Settings:
+    if fpath:
+        settings = parser_settings(fpath)
+    else:
+        settings = agc()
     validate_settings(settings)
     return Settings(
         width=cast(int, settings["WIDTH"]),

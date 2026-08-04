@@ -1,4 +1,4 @@
-from a_maze_ing.includes.includes import gen_nbr, gen_chars, split_by
+from a_maze_ing.includes.includes import gen_chars
 
 def validate_seed(seed: str) -> bool:
     if not seed:
@@ -10,5 +10,5 @@ def validate_seed(seed: str) -> bool:
     return True
 
 
-def gen_seed(entry: list, exit: list, width: int, height: int) -> str:
-    return gen_chars(20)
+def gen_seed(amount: int) -> str:
+    return gen_chars(amount)

@@ -1,17 +1,20 @@
-from a_maze_ing import runner, config_file, RED, DEFAULT, gen_chars, gen_nbr, agc, gen_seed
+from a_maze_ing import runner, config_file, RED, DEFAULT
 from a_maze_ing.src.gerete_maze import MazeGenerator
 import argparse
 
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("config", type=config_file,
+    parser.add_argument("config", nargs="?", type=config_file,
                         help="Maze configuration file")
 
     args = parser.parse_args()
 
     try:
-        settings = runner(fpath=args.config)
+        if args.config:
+            settings = runner(fpath=args.config)
+        else:
+            settings = runner()
         print(f"settings: {settings}\n\n\n\n")
         maze = MazeGenerator(settings)
         maze.debug_print()
@@ -29,7 +32,3 @@ if __name__ == "__main__":
         random.choice(["-L-", "-O-", "-N-", "-S-"]),
         random.choice(["-L-", "-O-", "-N-", "-S-"])
     )
-    # print(gen_chars(50))
-    # print(gen_nbr(3))
-    # print(agc())
-    # gen_seed()
