@@ -24,7 +24,11 @@ def main() -> int:
 if __name__ == "__main__":
     main()
     import random
-    print(random.random(), random.random(), random.random())
+    print(
+        random.choice(["-L-", "-O-", "-N-", "-S-"]),
+        random.choice(["-L-", "-O-", "-N-", "-S-"]),
+        random.choice(["-L-", "-O-", "-N-", "-S-"])
+    )
     # print(gen_chars(50))
     # print(gen_nbr(3))
     # print(agc())
