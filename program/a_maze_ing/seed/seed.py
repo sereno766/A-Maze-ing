@@ -1,5 +1,6 @@
 from a_maze_ing.includes.includes import gen_chars
 
+
 def validate_seed(seed: str) -> bool:
     if not seed:
         return False

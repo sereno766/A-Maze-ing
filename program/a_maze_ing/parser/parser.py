@@ -53,7 +53,7 @@ def agc() -> dict:
     entry = split_by(gen_nbr(2), 1, 2)
     exit = split_by(gen_nbr(4), 0, 2)
     valid = False
-    while valid == False:
+    while not valid:
         if ((int(exit[0]) >= width or int(exit[0]) >= height)
            or (int(exit[1]) >= width or int(exit[1]) >= height)):
             exit = split_by(gen_nbr(4), 0, 2)
@@ -115,6 +115,7 @@ def validate_settings(settings: dict) -> None:
             f"Seed '{seed}' is not valid, try to run "
             f"`python -m seed_generator` for a valid seed"
         )
+
 
 def parser_file(fpath: Path = None) -> Settings:
     if fpath:

@@ -12,8 +12,12 @@ class MazeGenerator:
         self.width = settings.width
         self.height = settings.height
 
-        self.grid = [[15 for x in range(self.width)] for y in range(self.height)]
-        self.visited = [[False for x in range(self.width)] for y in range(self.height)]
+        self.grid = [
+            [15 for x in range(self.width)] for y in range(self.height)
+        ]
+        self.visited = [
+            [False for x in range(self.width)] for y in range(self.height)
+        ]
 
     def debug_print(self) -> None:
         for linha in self.grid:

@@ -1,4 +1,4 @@
-from random import shuffle, sample
+from random import sample
 from string import ascii_letters, digits
 from time import sleep
 import subprocess
@@ -42,9 +42,11 @@ def clear(init_wait_time: int = 0, final_wait_time: int = 0) -> None:
     subprocess.run(cmd)
     sleep(float(final_wait_time))
 
+
 def gen_chars(amount: int = 10) -> str:
     chars = ascii_letters + digits
     return "".join(sample(chars, amount))
+
 
 def gen_nbr(amount: int = 2) -> str:
     return "".join(sample(digits, amount))
