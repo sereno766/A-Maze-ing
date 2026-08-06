@@ -2,7 +2,7 @@ import argparse
 from pathlib import Path
 from dataclasses import dataclass
 from typing import cast
-from a_maze_ing.seed.seed import validate_seed, gen_seed
+from a_maze_ing.src.seed import validate_seed, gen_seed
 from a_maze_ing.includes.includes import gen_nbr, split_by
 
 
@@ -38,6 +38,36 @@ class Settings:
     output: str
     seed: str
     perfect: bool
+
+
+def validate_dimensions(settings: dict) -> None:
+    width = settings.get("WIDTH")
+    height = settings.get("HEIGHT")
+    if width <= 0 or height <= 0:
+        raise ValueError(
+            "config.txt non-compliant: height and width values "
+            "must be greater than 0."
+        )
+
+    entry_x, entry_y = settings.get("ENTRY")
+    exit_x, exit_y = settings.get("EXIT")
+
+    if not (0 <= entry_x < width and 0 <= entry_y < height):
+        raise ValueError(
+            "config.txt non-compliant: the entry value must be "
+            "positive and smaller than the maze dimensions."
+        )
+
+    if not (0 <= exit_x < width and 0 <= exit_y < height):
+        raise ValueError(
+            "config.txt non-compliant: the exit value must be "
+            "positive and smaller than the maze dimensions."
+        )
+
+    if settings.get("ENTRY") == settings.get("EXIT"):
+        raise ValueError(
+            "config.txt non-compliant: entry and exit must be distinct"
+        )
 
 
 def gen_size(min: int, max: int) -> int:
@@ -122,6 +152,7 @@ def parser_file(fpath: Path = None) -> Settings:
         settings = parser_settings(fpath)
     else:
         settings = agc()
+    validate_dimensions(settings)
     validate_settings(settings)
     return Settings(
         width=cast(int, settings["WIDTH"]),

@@ -1,5 +1,4 @@
-from a_maze_ing import runner, config_file, RED, DEFAULT
-from a_maze_ing.src.gerete_maze import MazeGenerator
+from a_maze_ing import runner, config_file, RED, DEFAULT, MazeGenerator
 import argparse
 
 

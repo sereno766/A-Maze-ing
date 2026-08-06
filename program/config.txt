@@ -4,4 +4,3 @@ WIDTH=10
 EXIT=5,5
 OUTPUT_FILE=maze.txt
 PERFECT=True
-SEED=rJ04jzQSYweymsawdawdatWDk8f

@@ -1,4 +1,4 @@
-from a_maze_ing.parser.parser import Settings
+from a_maze_ing.src.parser import Settings
 from a_maze_ing.src.cell import Cell
 
 
