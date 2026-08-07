@@ -14,7 +14,7 @@ def main() -> int:
             settings = runner(fpath=args.config)
         else:
             settings = runner()
-        print(f"settings: {settings}\n\n\n\n")
+        print(f"settings: {settings}\n")
         maze = MazeGenerator(settings)
         maze.debug_print()
     except Exception as e:

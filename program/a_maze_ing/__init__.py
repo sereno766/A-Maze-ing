@@ -7,7 +7,7 @@ from a_maze_ing.src.seed import validate_seed, gen_seed
 from a_maze_ing.src.runner import runner
 from a_maze_ing.src.checker import checker
 from a_maze_ing.src.cell import Cell
-from a_maze_ing.src.generate_maze import MazeGenerator
+from a_maze_ing.src.maze import MazeGenerator
 
 
 __all__ = [
