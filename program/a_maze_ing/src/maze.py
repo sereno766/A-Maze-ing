@@ -34,7 +34,7 @@ class MazeRepresentation:
 
     def look_for_neighbors(self, x: int, y: int) -> None:
         n = None if not self.is_valid_pos(x, y - 1) else (y - 1, x)
-        s = None if not self.is_valid_pos(x, y + 1) else (y - 1, x)
+        s = None if not self.is_valid_pos(x, y + 1) else (y + 1, x)
         e = None if not self.is_valid_pos(x + 1, y) else (y, x + 1)
         w = None if not self.is_valid_pos(x - 1, y) else (y, x - 1)
         return [n, s, e, w]
