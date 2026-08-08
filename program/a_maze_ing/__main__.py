@@ -1,4 +1,4 @@
-from a_maze_ing import runner, config_file, RED, DEFAULT, MazeRepresentation
+from a_maze_ing import runner, config_file, RED, DEFAULT, Maze
 import argparse
 
 
@@ -15,8 +15,8 @@ def main() -> int:
         else:
             settings = runner()
         print(f"settings: {settings}\n")
-        maze = MazeRepresentation(settings)
-        maze.debug_print()
+        maze = Maze(settings)
+        maze.representation.debug_print()
     except Exception as e:
         print(f"{RED}Error: {e}{DEFAULT}")
         return 1
