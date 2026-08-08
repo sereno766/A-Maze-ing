@@ -4,7 +4,7 @@ from a_maze_ing.src.cell import Cell
 class Maze:
     def __init__(self, setting: Settings):
         self.setting = setting
-        self.representation = self.MazeRepresentation()
+        self.representation = self.MazeRepresentation(setting)
         self.generator = self.MazeGenerator()
 
     class MazeRepresentation:
@@ -13,13 +13,13 @@ class Maze:
         S: int = 4
         W: int = 8
 
-        def __init__(self):
-            self.mr_settings = self.settings
-            self.mr_width = self.settings.width
-            self.mr_height = self.settings.height
-            self.mr_grid = [
-                [Cell(x, y) for x in range(self.mr_width)]
-                for y in range(self.mr_height)
+        def __init__(self, setting: Settings):
+            self.settings = setting
+            self.width = self.settings.width
+            self.height = self.settings.height
+            self.grid = [
+                [Cell(x, y) for x in range(self.width)]
+                for y in range(self.height)
             ]
 
         def debug_print(self) -> None:
