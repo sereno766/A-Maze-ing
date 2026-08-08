@@ -23,6 +23,23 @@ class MazeRepresentation:
     def get_cell(self, x: int, y: int):
             return self.grid[y][x]
 
+    def remove_wall(self, x1: int, y1: int, x2: int, y2: int,) -> None:
+        cell_a = self.get_cell(x1, y1)
+        cell_b = self.get_cell(x2, y2)
+        if x2 == x1 and y2 == y1 - 1:
+            direction_a, direction_b = self.N, self.S
+        elif x2 == x1 and y2 == y1 + 1:
+            direction_a, direction_b = self.S, self.N
+        elif x2 == x1 + 2 and y2 == y1:
+            direction_a, direction_b = self.E, self.W
+        elif x2 == x1 - 1 and y2 == y1:
+            direction_a, direction_b = self.W, self.E
+        else:
+            raise ValueError(
+            f"cells ({x1},{y1}) and ({x2},{y2}) are not adjacent"
+        )
+        cell_a.walls &= ~direction_a
+        cell_b.walls &= ~direction_b
     #  y
     # x+x
     #  y
@@ -32,7 +49,7 @@ class MazeRepresentation:
     # (0,1)(1,1)(2,1)
     # (0,2)(1,2)(2,2)
 
-    def look_for_neighbors(self, x: int, y: int) -> None:
+    def look_for_neighbors(self, x: int, y: int) -> list[tuple[int, int] | None]:
         n = None if not self.is_valid_pos(x, y - 1) else (y - 1, x)
         s = None if not self.is_valid_pos(x, y + 1) else (y + 1, x)
         e = None if not self.is_valid_pos(x + 1, y) else (y, x + 1)
