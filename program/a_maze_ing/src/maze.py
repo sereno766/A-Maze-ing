@@ -2,6 +2,7 @@ from a_maze_ing.src.parser import Settings
 from a_maze_ing.src.cell import Cell
 import random
 
+
 class Maze:
     def __init__(self, setting: Settings):
         self.setting = setting
@@ -28,7 +29,7 @@ class Maze:
                 print([f"{celula.walls:2}" for celula in linha])
 
         def get_cell(self, x: int, y: int):
-                return self.grid[y][x]
+            return self.grid[y][x]
 
         def remove_wall(self, x1: int, y1: int, x2: int, y2: int,) -> None:
             cell_a = self.get_cell(x1, y1)
@@ -56,8 +57,9 @@ class Maze:
         # (0,1)(1,1)(2,1)
         # (0,2)(1,2)(2,2)
 
-        def look_for_neighbors(self, x: int,
-                            y: int) -> list[tuple[int, int] | None]:
+        def look_for_neighbors(
+            self, x: int, y: int
+        ) -> list[tuple[int, int] | None]:
             n = None if not self.is_valid_pos(x, y - 1) else (y - 1, x)
             s = None if not self.is_valid_pos(x, y + 1) else (y + 1, x)
             e = None if not self.is_valid_pos(x + 1, y) else (y, x + 1)
@@ -71,14 +73,18 @@ class Maze:
         def is_valid_pos(self, x: int, y: int) -> bool:
             return (0 <= x < self.width and 0 <= y < self.height)
 
-
     class MazeGenerator:
         def __init__(self, representation):
             self.representation = representation
 
         def generate(self) -> None:
             rep = self.representation
+            self._carve_perfect_maze(rep)
 
+            if not rep.settings.perfect:
+                self._add_loops(rep, min_loops=2)
+
+        def _carve_perfect_maze(self, rep) -> None:
             start_x, start_y = rep.settings.entry
             start = rep.get_cell(start_x, start_y)
             start.visited = True
@@ -93,9 +99,9 @@ class Maze:
                     if n is None:
                         continue
                     ny, nx = n
-                    neighbors_cell = rep.get_cell(nx, ny)
-                    if not neighbors_cell.visited and not neighbors_cell.is_42:
-                        candidates.append(neighbors_cell)
+                    neighbor_cell = rep.get_cell(nx, ny)
+                    if not neighbor_cell.visited and not neighbor_cell.is_42:
+                        candidates.append(neighbor_cell)
                 if candidates:
                     chosen = random.choice(candidates)
                     rep.remove_wall(current.x, current.y, chosen.x, chosen.y)
@@ -103,3 +109,50 @@ class Maze:
                     stack.append(chosen)
                 else:
                     stack.pop()
+
+        def _add_loops(self, rep, min_loops: int) -> None:
+            dead_ends = [
+                cell
+                for row in rep.grid
+                for cell in row
+                if not cell.is_42 and self._open_wall_count(cell.walls) == 1
+            ]
+            random.shuffle(dead_ends)
+
+            loops_created = 0
+            for cell in dead_ends:
+                if loops_created >= min_loops:
+                    break
+
+                neighbors = rep.look_for_neighbors(cell.x, cell.y)
+                candidates = []
+                for n in neighbors:
+                    if n is None:
+                        continue
+                    ny, nx = n
+                    neighbor = rep.get_cell(nx, ny)
+                    if neighbor.is_42:
+                        continue
+                    if not self._already_connected(rep, cell, neighbor):
+                        candidates.append(neighbor)
+
+                if candidates:
+                    chosen = random.choice(candidates)
+                    rep.remove_wall(cell.x, cell.y, chosen.x, chosen.y)
+                    loops_created += 1
+
+        @staticmethod
+        def _open_wall_count(walls: int) -> int:
+            return 4 - bin(walls).count("1")
+
+        @staticmethod
+        def _already_connected(rep, cell_a, cell_b) -> bool:
+            if cell_b.y == cell_a.y - 1:
+                return cell_a.walls & rep.N == 0
+            if cell_b.y == cell_a.y + 1:
+                return cell_a.walls & rep.S == 0
+            if cell_b.x == cell_a.x + 1:
+                return cell_a.walls & rep.E == 0
+            if cell_b.x == cell_a.x - 1:
+                return cell_a.walls & rep.W == 0
+            return False

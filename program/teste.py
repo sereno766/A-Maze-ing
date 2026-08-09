@@ -1,3 +1,4 @@
+import random
 from a_maze_ing import Settings, Maze
 
 
@@ -7,6 +8,7 @@ def main() -> None:
         entry=(0, 0), exit=(4, 4),
         output="maze.txt", seed="abc123", perfect=True
     )
+    random.seed(settings.seed)
     maze = Maze(settings)
 
     print("=== Antes de gerar (tudo deve ser 15) ===")
@@ -14,7 +16,8 @@ def main() -> None:
 
     maze.generator.generate()
 
-    print("\n=== Depois de gerar ===")
+    print(f"\nSEED ==== {settings.seed}")
+    print("=== Depois de gerar ===")
     maze.representation.debug_print()
 
     # Confere se sobrou alguma célula intocada (walls == 15),
