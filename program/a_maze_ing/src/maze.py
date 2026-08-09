@@ -1,11 +1,12 @@
 from a_maze_ing.src.parser import Settings
 from a_maze_ing.src.cell import Cell
+import random
 
 class Maze:
     def __init__(self, setting: Settings):
         self.setting = setting
         self.representation = self.MazeRepresentation(setting)
-        self.generator = self.MazeGenerator()
+        self.generator = self.MazeGenerator(self.representation)
 
     class MazeRepresentation:
         N: int = 1
@@ -36,14 +37,14 @@ class Maze:
                 direction_a, direction_b = self.N, self.S
             elif x2 == x1 and y2 == y1 + 1:
                 direction_a, direction_b = self.S, self.N
-            elif x2 == x1 + 2 and y2 == y1:
+            elif x2 == x1 + 1 and y2 == y1:
                 direction_a, direction_b = self.E, self.W
             elif x2 == x1 - 1 and y2 == y1:
                 direction_a, direction_b = self.W, self.E
             else:
                 raise ValueError(
-                f"cells ({x1},{y1}) and ({x2},{y2}) are not adjacent"
-            )
+                    f"cells ({x1},{y1}) and ({x2},{y2}) are not adjacent"
+                )
             cell_a.walls &= ~direction_a
             cell_b.walls &= ~direction_b
         #  y
@@ -72,9 +73,33 @@ class Maze:
 
 
     class MazeGenerator:
-        def __init__(self):
-            pass
+        def __init__(self, representation):
+            self.representation = representation
 
         def generate(self) -> None:
-            print("starting to generate maze")
+            rep = self.representation
 
+            start_x, start_y = rep.settings.entry
+            start = rep.get_cell(start_x, start_y)
+            start.visited = True
+            stack = [start]
+
+            while stack:
+                current = stack[-1]
+
+                neighbors = rep.look_for_neighbors(current.x, current.y)
+                candidates = []
+                for n in neighbors:
+                    if n is None:
+                        continue
+                    ny, nx = n
+                    neighbors_cell = rep.get_cell(nx, ny)
+                    if not neighbors_cell.visited and not neighbors_cell.is_42:
+                        candidates.append(neighbors_cell)
+                if candidates:
+                    chosen = random.choice(candidates)
+                    rep.remove_wall(current.x, current.y, chosen.x, chosen.y)
+                    chosen.visited = True
+                    stack.append(chosen)
+                else:
+                    stack.pop()
