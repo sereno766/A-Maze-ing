@@ -18,11 +18,29 @@ BINARY = {
     "1111": "Oo?",
     "1110": "Nn",
     "1101": "Mm",
-    "0110": "FVfv6#",
+    "0110": "Vv6#",
     "1010": "JZjz",
     "1100": "Ll",
     "0000": "Vp0"
 }
+# BINARY = {
+#     "0001": "⬛⬛⬛",
+#     "0010": "⬛⬛⬛",
+#     "0100": "⬛⬛⬛",
+#     "1000": "⬛⬛⬛",
+#     "0011": "⬛⬛⬛",
+#     "0101": "⬛⬛⬛",
+#     "1001": "⬛⬛⬛",
+#     "0111": "⬛⬛⬛",
+#     "1011": "⬛⬛⬛",
+#     "1111": "⬛⬛⬛",
+#     "1110": "⬛⬛⬛",
+#     "1101": "⬛⬛⬛",
+#     "0110": "⬛⬛⬛",
+#     "1010": "⬛⬛⬛",
+#     "1100": "⬛⬛⬛",
+#     "0000": "⬛⬛⬛"
+# }
 
 class Maze:
     def __init__(self, setting: Settings):
@@ -102,7 +120,7 @@ class Maze:
         #    f fff
 
         @staticmethod
-        def get_coords(init_x: int, init_y: int) -> list[tuple]:
+        def get_coords(init_x: int, init_y: int, width: int,) -> list[tuple]:
             mapped = [
                     (0, 0), (0, 4), (0, 5), (0, 6),
                     (1, 0), (1, 6),
@@ -125,21 +143,22 @@ class Maze:
             return sample(to_choose, 1)
 
         def represent(self) -> str:
-            init_ft_x = int((self.width / 2 - 7) if is_even(self.width)
-                             else ((self.width - 1) / 2 - 7))
-            init_ft_y = int((self.height / 2 - 5) if is_even(self.height)
-                             else ((self.height - 1) / 2 - 5))
+            init_ft_x = int((self.width / 2 - 3) if is_even(self.width)
+                             else ((self.width - 1) / 2 - 3))
+            init_ft_y = int((self.height / 2 - 2) if is_even(self.height)
+                             else ((self.height - 1) / 2 - 2))
             print(init_ft_x)
             print(init_ft_y)
-            ft_coords = self.get_coords(init_ft_x, init_ft_y)
+            ft_coords = self.get_coords(init_ft_x, init_ft_y, self.width)
             build_representation = []
             for y in range(self.height):
                 for x in range(self.width):
                     neighbors = self.look_for_neighbors(x, y)
                     to_append = None
-                    for coord in ft_coords:
-                        if tuple((y, x)) == coord:
-                            to_append = "F"
+                    if self.width >= 13:
+                        for coord in ft_coords:
+                            if tuple((y, x)) == coord:
+                                to_append = "F"
                     if not to_append:
                         to_append = "".join(self.get_hexbit(neighbors, x, y))
                     build_representation.append(to_append)
