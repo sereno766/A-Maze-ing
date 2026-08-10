@@ -13,6 +13,9 @@ CYAN = "\033[1;36m"
 INVERT = "\033[1;4;7;97m"
 BOLD = "\033[1m"
 
+def is_even(nbr: int) -> bool:
+    return nbr % 2 == 0
+
 
 def clear(init_wait_time: int = 0, final_wait_time: int = 0) -> None:
     """
