@@ -1,5 +1,6 @@
 from a_maze_ing.src.parser import Settings
 from a_maze_ing.src.cell import Cell
+from collections import deque
 import random
 
 
@@ -72,6 +73,73 @@ class Maze:
 
         def is_valid_pos(self, x: int, y: int) -> bool:
             return (0 <= x < self.width and 0 <= y < self.height)
+
+        def find_shortest_path(self) -> list[str]:
+            start_x, start_y = self.settings.entry
+            end_x, end_y = self.settings.exit
+            start = self.get_cell(start_x, start_y)
+            end = self.get_cell(end_x, end_y)
+
+            visited = {start}
+            predecessors = {}
+            queue = deque([start])
+
+            while queue:
+                current = queue.popleft()
+
+                if current is end:
+                    break
+
+                neighbors = self.look_for_neighbors(current.x, current.y)
+                for n in neighbors:
+                    if n is None:
+                        continue
+                    ny, nx = n
+                    neighbor = self.get_cell(nx, ny)
+
+                    if neighbor in visited:
+                        continue
+
+                    if not self._is_open(current, neighbor):
+                        continue
+
+                    visited.add(neighbor)
+                    predecessors[neighbor] = current
+                    queue.append(neighbor)
+
+            path_cells = [end]
+            current = end
+            while current is not start:
+                current = predecessors[current]
+                path_cells.append(current)
+            path_cells.reverse()
+
+            return self._cells_to_directions(path_cells)
+
+        def _is_open(self, cell_a, cell_b) -> bool:
+            if cell_b.y == cell_a.y - 1:
+                return cell_a.walls & self.N == 0
+            if cell_b.y == cell_a.y + 1:
+                return cell_a.walls & self.S == 0
+            if cell_b.x == cell_a.x + 1:
+                return cell_a.walls & self.E == 0
+            if cell_b.x == cell_a.x - 1:
+                return cell_a.walls & self.W == 0
+            return False
+
+        @staticmethod
+        def _cells_to_directions(cells: list) -> list[str]:
+            directions = []
+            for a, b in zip(cells, cells[1:]):
+                if b.y == a.y - 1:
+                    directions.append("N")
+                elif b.y == a.y + 1:
+                    directions.append("S")
+                elif b.x == a.x + 1:
+                    directions.append("E")
+                elif b.x == a.x - 1:
+                    directions.append("W")
+            return directions
 
     class MazeGenerator:
         def __init__(self, representation):

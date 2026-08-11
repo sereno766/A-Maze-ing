@@ -6,7 +6,7 @@ def main() -> None:
     settings = Settings(
         width=5, height=5,
         entry=(0, 0), exit=(4, 4),
-        output="maze.txt", seed="abc123", perfect=True
+        output="maze.txt", seed="abc123", perfect=False
     )
     random.seed(settings.seed)
     maze = Maze(settings)
@@ -30,6 +30,11 @@ def main() -> None:
 
     print("\n=== Células nunca visitadas (deveria ser vazio) ===")
     print(intocadas)
+
+    print("\n=== Caminho mais curto (entry -> exit) ===")
+    caminho = maze.representation.find_shortest_path()
+    print("".join(caminho))
+    print(f"Total de passos: {len(caminho)}")
 
 
 if __name__ == "__main__":
