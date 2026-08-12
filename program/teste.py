@@ -36,6 +36,11 @@ def main() -> None:
     print("".join(caminho))
     print(f"Total de passos: {len(caminho)}")
 
+    print(f"\n=== Escrevendo arquivo de saída: {settings.output} ===")
+    maze.representation.write_output_file()
+    with open(settings.output) as f:
+        print(f.read())
+
 
 if __name__ == "__main__":
     main()

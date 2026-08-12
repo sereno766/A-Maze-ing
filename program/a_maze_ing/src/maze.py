@@ -217,6 +217,21 @@ class Maze:
                     directions.append("W")
             return directions
 
+        def write_output_file(self) -> None:
+            with open(self.settings.output, "w") as file:
+                for row in self.grid:
+                    line = "".join(f"{cell.walls:X}" for cell in row)
+                    file.write(line + "\n")
+
+                entry_x, entry_y = self.settings.entry
+                exit_x, exit_y = self.settings.exit
+                path = "".join(self.find_shortest_path())
+
+                file.write("\n")
+                file.write(f"{entry_x},{entry_y}\n")
+                file.write(f"{exit_x},{exit_y}\n")
+                file.write(f"{path}\n")
+
     class MazeGenerator:
         def __init__(self, representation):
             self.representation = representation
