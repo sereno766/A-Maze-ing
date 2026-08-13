@@ -11,12 +11,9 @@ def main() -> int:
 
     try:
         if args.config:
-            settings = runner(fpath=args.config)
+            runner(fpath=args.config)
         else:
-            settings = runner()
-        print(f"settings: {settings}\n")
-        maze = Maze(settings)
-        maze.representation.debug_print()
+            runner()
     except Exception as e:
         print(f"{RED}Error: {e}{DEFAULT}")
         return 1
