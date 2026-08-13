@@ -3,62 +3,6 @@ from a_maze_ing.src.cell import Cell
 import random
 
 from a_maze_ing import is_even
-from random import sample
-
-BINARY = {
-    "0001": "1",
-    "0010": "2",
-    "0100": "4",
-    "1000": "8",
-    "0011": "3",
-    "0101": "5",
-    "1001": "9",
-    "0111": "7",
-    "1011": "k",
-    "1111": "o",
-    "1110": "n",
-    "1101": "m",
-    "0110": "6",
-    "1010": "z",
-    "1100": "l",
-    "0000": "p"
-}
-#BINARY = {
-#    "0001": "AQaq1!",
-#    "0010": "BRbr2",
-#    "0100": "DTdt4",
-#    "1000": "HXhx8",
-#    "0011": "CScs3#",
-#    "0101": "EUeu5",
-#    "1001": "IYiy9",
-#    "0111": "GWgw7",
-#    "1011": "Kk",
-#    "1111": "Oo?",
-#    "1110": "Nn",
-#    "1101": "Mm",
-#    "0110": "Vv6#",
-#    "1010": "JZjz",
-#    "1100": "Ll",
-#    "0000": "Vp0"
-#}
-# BINARY = {
-#     "0001": "⬛⬛⬛",
-#     "0010": "⬛⬛⬛",
-#     "0100": "⬛⬛⬛",
-#     "1000": "⬛⬛⬛",
-#     "0011": "⬛⬛⬛",
-#     "0101": "⬛⬛⬛",
-#     "1001": "⬛⬛⬛",
-#     "0111": "⬛⬛⬛",
-#     "1011": "⬛⬛⬛",
-#     "1111": "⬛⬛⬛",
-#     "1110": "⬛⬛⬛",
-#     "1101": "⬛⬛⬛",
-#     "0110": "⬛⬛⬛",
-#     "1010": "⬛⬛⬛",
-#     "1100": "⬛⬛⬛",
-#     "0000": "⬛⬛⬛"
-# }
 
 class Maze:
     def __init__(self, setting: Settings):
@@ -71,11 +15,6 @@ class Maze:
         E: int = 2
         S: int = 4
         W: int = 8
-
-        binary_list_placeholder = ["0001", "0010", "0100", "1000", "0011",
-                                   "0101", "1001", "0111", "1011", "1111",
-                                   "1110", "1101", "0110", "1010", "1100",
-                                   "0000"]
 
         def __init__(self, setting: Settings):
             self.settings = setting
@@ -123,22 +62,6 @@ class Maze:
             w = None if not self.is_valid_pos(x - 1, y) else (y, x - 1)
             return [n, s, e, w]
 
-
-        #  y
-        # x+x
-        #  y
-
-        # (y,x)
-        # (0,0)(0,1)(0,2)
-        # (1,0)(1,1)(1,2)
-        # (2,0)(2,1)(2,2)
-
-        #  f   fff
-        #  f     f
-        #  fff fff
-        #    f f
-        #    f fff
-
         @staticmethod
         def get_coords(init_x: int, init_y: int) -> list[tuple]:
             mapped = [
@@ -155,13 +78,13 @@ class Maze:
             return coords
 
         def make_pattern(self) -> None:
-            if self.width <= 12:
-                return
             init_ft_x = int((self.width / 2 - 4) if is_even(self.width)
                             else ((self.width - 1) / 2 - 3))
             init_ft_y = int((self.height / 2 - 3) if is_even(self.height)
                             else ((self.height - 1) / 2 - 2))
             ft_coords = self.get_coords(init_ft_x, init_ft_y)
+            if self.width <= 12 or self.height <= 12:
+                return
             for y, x in ft_coords:
                 if self.is_valid_pos(x, y):
                     self.get_cell(x, y).is_42 = True
@@ -176,20 +99,16 @@ class Maze:
                 ])
 
         def get_hexbit(self, cell: Cell) -> str:
-            binary_built = self.wall_to_binary(cell.walls)
-            to_choose = BINARY[binary_built]
-            #return sample(to_choose, 1)[0]
-            return to_choose
+            if cell.is_42:
+                return "F"
+            return "".join(f"{cell.walls:X}")
 
         def represent(self) -> str:
             build_representation = []
             for y in range(self.height):
                 for x in range(self.width):
                     cell = self.get_cell(x, y)
-                    if cell.is_42:
-                        to_append = "F"
-                    else:
-                        to_append = self.get_hexbit(cell)
+                    to_append = self.get_hexbit(cell)
                     build_representation.append(to_append)
                 build_representation.append("\n")
             return "".join(build_representation)
