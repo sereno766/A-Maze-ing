@@ -26,6 +26,7 @@ class Maze:
                 for y in range(self.height)
             ]
             self.make_pattern()
+            self.path_out = ""
 
         def debug_print(self) -> None:
             for linha in self.grid:
@@ -90,8 +91,7 @@ class Maze:
                 if self.is_valid_pos(x, y):
                     self.get_cell(x, y).is_42 = True
 
-
-        def wall_to_binary(self, walls: int) -> str:
+        def wall_to_binary(self, walls: int) -> str: #REMOVE
             return "".join([
                 "1" if walls & self.N else "0",
                 "1" if walls & self.E else "0",
@@ -186,18 +186,26 @@ class Maze:
 
         def write_output_file(self) -> None:
             with open(self.settings.output, "w") as file:
-                for row in self.grid:
-                    line = "".join(f"{cell.walls:X}" for cell in row)
-                    file.write(line + "\n")
+                file.write(self.represent())
 
                 entry_x, entry_y = self.settings.entry
                 exit_x, exit_y = self.settings.exit
                 path = "".join(self.find_shortest_path())
+                self.path_out = path
 
                 file.write("\n")
                 file.write(f"{entry_x},{entry_y}\n")
                 file.write(f"{exit_x},{exit_y}\n")
                 file.write(f"{path}\n")
+
+        def return_maze_grid(self) -> list:
+            maze_grid = []
+            for row in self.grid:
+                for cell in row:
+                    maze_grid.append(cell.walls)
+                maze_grid.append("\n")
+            return maze_grid
+
 
     class MazeGenerator:
         def __init__(self, representation):
