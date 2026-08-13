@@ -24,7 +24,7 @@ config:
 install:
 
 run:
-	$(PY) -m a_maze_ing config.txt --debug
+	$(PY) -m a_maze_ing
 
 debug:
 
