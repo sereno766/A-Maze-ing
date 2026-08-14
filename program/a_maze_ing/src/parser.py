@@ -242,10 +242,80 @@ def validate_settings(settings: dict) -> None:
         settings["SEED"] = gen_seed(20)
     elif not validate_seed(seed):
         raise ValueError(
-            f"Seed '{seed}' is not valid, try to run "
-            f"`python -m seed_generator` for a valid seed"
+            f"Seed '{seed}' is not valid!"
         )
 
+def file_is_empty(path: Path = None) -> bool:
+    with path.open() as file:
+        for line in file:
+            if line != "":
+                return False
+    return True
+
+def validate_values(path: Path = None) -> bool:
+    with path.open() as file:
+        for line in file:
+            line = line.strip()
+            if not line or "=" not in line:
+                continue
+            key, value = line.split("=", 1)
+            if key in ("WIDTH", "HEIGHT"):
+                try:
+                    int(value)
+                except ValueError:
+                    raise ValueError(
+                        f"{key} must be an integer"
+                    )
+            elif key in ("ENTRY", "EXIT"):
+                try:
+                    x, y = value.split(",", 1)
+                    int(x)
+                    int(y)
+                except ValueError:
+                    raise ValueError(
+                        f"{key} must be in the format X,Y and must be integer"
+                    )
+            elif key == "PERFECT":
+                if value not in ("True", "False"):
+                    raise ValueError(
+                        "PERFECT must be True or False"
+                    )
+            elif key == "SEED":
+                value = value.replace('"', "")
+                if value and not validate_seed(value):
+                    raise ValueError(
+                        f"Seed '{value}' is not valid!"
+                    )
+            elif key == "OUTPUT_FILE":
+                if not value:
+                    raise ValueError(
+                        "OUTPUT_FILE cannot be empty"
+                    )
+    return True
+
+
+def validate_file(path: Path = None) -> bool:
+    settings_in_file = []
+    valid_settings = ["WIDTH", "HEIGHT", "ENTRY", "EXIT",
+                      "OUTPUT_FILE", "PERFECT", "SEED"]
+    with path.open() as file:
+            for line in file:
+                if "=" in line:
+                    splited = line.split("=")
+                    if not splited[1]:
+                        raise ValueError(f"{splited[0]} is missing a value")
+                    settings_in_file.append(splited[0])
+    for i in settings_in_file:
+        if i not in valid_settings:
+            raise ValueError(f"{i} is not a valid setting")
+    for j in valid_settings:
+        if j not in settings_in_file:
+            if j == "SEED":
+                continue
+            raise ValueError(f"{j} is missing in config.txt")
+    if validate_values(path):
+        return True
+    return False
 
 def parser_file(fpath: Path = None) -> Settings:
     """Run the full config parsing pipeline and return a typed Settings.
@@ -258,7 +328,10 @@ def parser_file(fpath: Path = None) -> Settings:
         A fully validated Settings instance.
     """
     if fpath:
-        settings = parser_settings(fpath)
+        if file_is_empty(fpath):
+            raise SyntaxError("config.txt is empty!")
+        if validate_file(fpath):
+            settings = parser_settings(fpath)
     else:
         settings = agc()
     validate_dimensions(settings)

@@ -1,22 +1,33 @@
 import random
-from a_maze_ing.src.parser import parser_file, Settings
+from a_maze_ing.src.parser import parser_file
+from a_maze_ing.src.maze import Maze
 from pathlib import Path
 
 
-def runner(fpath: Path = None) -> Settings:
-    """Run the full configuration pipeline for a maze.
+class Runner:
+    """Runs the full pipeline: parse config, generate, write output."""
 
-    Parses (or auto-generates, if `fpath` is None) the configuration,
-    validates it, and initializes the global random number generator
-    with the resulting seed so that maze generation stays reproducible.
+    def __init__(self):
+        pass
 
-    Args:
-        fpath: Path to the config.txt file. If None, a random valid
-            configuration is generated instead.
+    def run(self, fpath: Path = None) -> dict:
+        """Parse, generate and write a maze, then return its info.
 
-    Returns:
-        The validated Settings ready to be used to build a Maze.
-    """
-    settings = parser_file(fpath)
-    random.seed(settings.seed)
-    return settings
+        Args:
+            fpath: Path to the config.txt file. If None, a random
+                valid configuration is generated instead.
+
+        Returns:
+            A dict with the flattened maze grid ("maze_grid") and
+            the shortest solution path ("maze_path").
+        """
+        settings = parser_file(fpath)
+        random.seed(settings.seed)
+        maze = Maze(settings)
+        maze.generator.generate()
+        maze.representation.write_output_file()
+        ret = {
+            "maze_grid": maze.representation.return_maze_grid(),
+            "maze_path": maze.representation.path_out
+        }
+        return ret

@@ -3,6 +3,7 @@ from a_maze_ing.src.cell import Cell
 from collections import deque
 import random
 
+from a_maze_ing import is_even
 
 class Maze:
     """Top-level, reusable maze object.
@@ -53,6 +54,8 @@ class Maze:
                 [Cell(x, y) for x in range(self.width)]
                 for y in range(self.height)
             ]
+            self.make_pattern()
+            self.path_out = ""
 
         def debug_print(self) -> None:
             """Print the raw wall value of every cell, row by row.
@@ -62,6 +65,8 @@ class Maze:
             """
             for linha in self.grid:
                 print([f"{celula.walls:2}" for celula in linha])
+            print("-" * 42, end="\n\n\n")
+            print(self.represent())
 
         def get_cell(self, x: int, y: int) -> Cell:
             """Return the Cell stored at grid coordinates (x, y).
@@ -109,14 +114,6 @@ class Maze:
                 )
             cell_a.walls &= ~direction_a
             cell_b.walls &= ~direction_b
-        #  y
-        # x+x
-        #  y
-
-        # (x,y)
-        # (0,0)(1,0)(2,0)
-        # (0,1)(1,1)(2,1)
-        # (0,2)(1,2)(2,2)
 
         def look_for_neighbors(
             self, x: int, y: int
@@ -139,9 +136,61 @@ class Maze:
             w = None if not self.is_valid_pos(x - 1, y) else (y, x - 1)
             return [n, s, e, w]
 
+        @staticmethod
+        def get_coords(init_x: int, init_y: int) -> list[tuple]:
+            mapped = [
+                    (0, 0), (0, 4), (0, 5), (0, 6),
+                    (1, 0), (1, 6),
+                    (2, 0), (2, 1), (2, 2), (2, 4), (2, 5), (2,6),
+                    (3, 2), (3, 4),
+                    (4, 2), (4, 4), (4, 5), (4, 6)
+                    ]
+            coords = list()
+            for y, x in mapped:
+                tup = (init_y + y, init_x + x)
+                coords.append(tup)
+            return coords
+
+        def make_pattern(self) -> None:
+            init_ft_x = int((self.width / 2 - 4) if is_even(self.width)
+                            else ((self.width - 1) / 2 - 3))
+            init_ft_y = int((self.height / 2 - 3) if is_even(self.height)
+                            else ((self.height - 1) / 2 - 2))
+            ft_coords = self.get_coords(init_ft_x, init_ft_y)
+            if self.width <= 12 or self.height <= 12:
+                return
+            for y, x in ft_coords:
+                if self.is_valid_pos(x, y):
+                    self.get_cell(x, y).is_42 = True
+
+        def wall_to_binary(self, walls: int) -> str: #REMOVE
+            return "".join([
+                "1" if walls & self.N else "0",
+                "1" if walls & self.E else "0",
+                "1" if walls & self.S else "0",
+                "1" if walls & self.W else "0",
+                ])
+
+        def get_hexbit(self, cell: Cell) -> str:
+            if cell.is_42:
+                return "F"
+            return "".join(f"{cell.walls:X}")
+
         def represent(self) -> str:
-            """Placeholder for the future visual (ASCII/MLX) rendering."""
-            build_representation: list = []
+            """Build the maze's hexadecimal text representation.
+
+            Returns:
+                One hexadecimal digit per cell (row by row, with a
+                newline between rows), as required by the output
+                file format.
+            """
+            build_representation = []
+            for y in range(self.height):
+                for x in range(self.width):
+                    cell = self.get_cell(x, y)
+                    to_append = self.get_hexbit(cell)
+                    build_representation.append(to_append)
+                build_representation.append("\n")
             return "".join(build_representation)
 
         def is_valid_pos(self, x: int, y: int) -> bool:
@@ -261,18 +310,26 @@ class Maze:
             shortest solution path.
             """
             with open(self.settings.output, "w") as file:
-                for row in self.grid:
-                    line = "".join(f"{cell.walls:X}" for cell in row)
-                    file.write(line + "\n")
+                file.write(self.represent())
 
                 entry_x, entry_y = self.settings.entry
                 exit_x, exit_y = self.settings.exit
                 path = "".join(self.find_shortest_path())
+                self.path_out = path
 
                 file.write("\n")
                 file.write(f"{entry_x},{entry_y}\n")
                 file.write(f"{exit_x},{exit_y}\n")
                 file.write(f"{path}\n")
+
+        def return_maze_grid(self) -> list:
+            maze_grid = []
+            for row in self.grid:
+                for cell in row:
+                    maze_grid.append(cell.walls)
+                maze_grid.append("\n")
+            return maze_grid
+
 
     class MazeGenerator:
         """Carves a maze into a given :class:`MazeRepresentation`.
@@ -300,8 +357,10 @@ class Maze:
             are then added to satisfy the Pac-Man-style requirements.
             """
             rep = self.representation
+            for row in rep.grid:
+                for cell in row:
+                    cell.visited = False
             self._carve_perfect_maze(rep)
-
             if not rep.settings.perfect:
                 self._add_loops(rep, min_loops=2)
 
