@@ -50,11 +50,27 @@ def clear(init_wait_time: int = 0, final_wait_time: int = 0) -> None:
 
 
 def gen_chars(amount: int = 10) -> str:
+    """
+    Generate a random alphanumeric string.
+
+    :param amount: Number of characters to generate.
+    :type amount: int
+    :return: A random string made of letters and digits.
+    :rtype: str
+    """
     chars = ascii_letters + digits
     return "".join(sample(chars, amount))
 
 
 def gen_nbr(amount: int = 2) -> str:
+    """
+    Generate a random string of digits.
+
+    :param amount: Number of digits to generate.
+    :type amount: int
+    :return: A random string made of digits only.
+    :rtype: str
+    """
     return "".join(sample(digits, amount))
 
 

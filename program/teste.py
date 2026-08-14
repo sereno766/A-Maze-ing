@@ -4,7 +4,7 @@ from a_maze_ing import Settings, Maze
 
 def main() -> None:
     settings = Settings(
-        width=5, height=5,
+        width=20, height=20,
         entry=(0, 0), exit=(4, 4),
         output="maze.txt", seed="abc123", perfect=False
     )

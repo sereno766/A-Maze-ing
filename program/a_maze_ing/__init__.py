@@ -12,7 +12,7 @@ from a_maze_ing.src.shell import Shell
 
 
 __all__ = [
-    "clear", "gen_chars", "gen_nbr", "split_by", "is_even"
+    "clear", "gen_chars", "gen_nbr", "split_by", "is_even",
     "checker",
     "DEFAULT", "RED", "GREEN", "YLOW", "PINK", "CYAN", "INVERT", "BOLD",
     "parser_file", "config_file", "Settings",
