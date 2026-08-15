@@ -1,3 +1,4 @@
+from typing import Any
 from a_maze_ing.src.runner import Runner
 from a_maze_ing.includes.includes import clear
 from pathlib import Path
@@ -7,7 +8,7 @@ from a_maze_ing.src.render import Render
 from sys import exit
 
 OPTIONS = """1.  Re-generate a new maze
-2.  Show or hide the shortest path 
+2.  Show or hide the shortest path
 3.  Change colors
 4.  Quit"""
 
@@ -23,12 +24,12 @@ UNKNOWN_ERR = "Error: unknown erro on creating maze"
 NO_MAZE = "No maze generated yet. Use option 1 to generate one."
 
 class Shell:
-    def __init__(self):
+    def __init__(self) -> None:
         self.runner = Runner()
         self.render = Render()
         self.fpath: Path
 
-    def init_shell(self, fpath: Path = None):
+    def init_shell(self, fpath: Path | None = None) -> None:
         print("shell initiated!")
         self.fpath = fpath
 
@@ -69,7 +70,7 @@ class Shell:
     def define_show_path(actual_definition: bool) -> bool:
         return False if actual_definition else True
 
-    def shell(self):
+    def shell(self) -> None:
         print("shell opened")
         c_code, c_maze, c_path, c_ftp = self.colorize(3)
         cmd = 1

@@ -1,4 +1,4 @@
-from a_maze_ing import config_file, RED, DEFAULT, Shell
+from a_maze_ing import config_file, Shell
 import argparse
 
 

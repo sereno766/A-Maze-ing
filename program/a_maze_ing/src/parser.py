@@ -1,7 +1,7 @@
 import argparse
 from pathlib import Path
 from dataclasses import dataclass
-from typing import cast
+from typing import Any, cast
 from a_maze_ing.src.seed import validate_seed, gen_seed
 from a_maze_ing.includes.includes import gen_nbr, split_by
 
@@ -35,7 +35,7 @@ def parser_seed(value: str = "") -> str:
     return value.replace('"', '')
 
 
-PARSER = {
+PARSER: dict[str, Any] = {
     "WIDTH": int,
     "HEIGHT": int,
     "ENTRY": parse_coord,
@@ -81,16 +81,16 @@ def validate_dimensions(settings: dict) -> None:
             exit fall outside the maze bounds, or if entry and exit
             are the same cell.
     """
-    width = settings.get("WIDTH")
-    height = settings.get("HEIGHT")
+    width = settings["WIDTH"]
+    height = settings["HEIGHT"]
     if width <= 0 or height <= 0:
         raise ValueError(
             "config.txt non-compliant: height and width values "
             "must be greater than 0."
         )
 
-    entry_x, entry_y = settings.get("ENTRY")
-    exit_x, exit_y = settings.get("EXIT")
+    entry_x, entry_y = settings["ENTRY"]
+    exit_x, exit_y = settings["EXIT"]
 
     if not (0 <= entry_x < width and 0 <= entry_y < height):
         raise ValueError(
@@ -245,7 +245,7 @@ def validate_settings(settings: dict) -> None:
     if missing:
         raise ValueError(f"Missing settings: {', '.join(sorted(missing))}")
 
-    seed = settings.get("SEED")
+    seed = settings["SEED"]
 
     if seed == "not-setted":
         settings["SEED"] = gen_seed(20)
@@ -254,14 +254,16 @@ def validate_settings(settings: dict) -> None:
             f"Seed '{seed}' is not valid!"
         )
 
-def file_is_empty(path: Path = None) -> bool:
+
+def file_is_empty(path: Path) -> bool:
     with path.open() as file:
         for line in file:
             if line != "":
                 return False
     return True
 
-def validate_values(path: Path = None) -> bool:
+
+def validate_values(path: Path) -> bool:
     with path.open() as file:
         for line in file:
             line = line.strip()
@@ -303,17 +305,17 @@ def validate_values(path: Path = None) -> bool:
     return True
 
 
-def validate_file(path: Path = None) -> bool:
+def validate_file(path: Path) -> bool:
     settings_in_file = []
     valid_settings = ["WIDTH", "HEIGHT", "ENTRY", "EXIT",
                       "OUTPUT_FILE", "PERFECT", "SEED"]
     with path.open() as file:
-            for line in file:
-                if "=" in line:
-                    splited = line.split("=")
-                    if not splited[1]:
-                        raise ValueError(f"{splited[0]} is missing a value")
-                    settings_in_file.append(splited[0])
+        for line in file:
+            if "=" in line:
+                splited = line.split("=")
+                if not splited[1]:
+                    raise ValueError(f"{splited[0]} is missing a value")
+                settings_in_file.append(splited[0])
     for i in settings_in_file:
         if i not in valid_settings:
             raise ValueError(f"{i} is not a valid setting")
@@ -326,7 +328,8 @@ def validate_file(path: Path = None) -> bool:
         return True
     return False
 
-def parser_file(fpath: Path = None) -> Settings:
+
+def parser_file(fpath: Path | None = None) -> Settings:
     """Run the full config parsing pipeline and return a typed Settings.
 
     Args:
