@@ -5,13 +5,17 @@ import subprocess
 import os
 
 DEFAULT = "\033[m"
+BLACK = "\033[1;30m"
 RED = "\033[1;31m"
 GREEN = "\033[1;32m"
 YLOW = "\033[1;33m"
+BLUE = "\033[1;34m"
 PINK = "\033[1;35m"
 CYAN = "\033[1;36m"
+WHITE = "\033[1;37m"
 INVERT = "\033[1;4;7;97m"
 BOLD = "\033[1m"
+
 
 def is_even(nbr: int) -> bool:
     return nbr % 2 == 0
@@ -47,11 +51,27 @@ def clear(init_wait_time: int = 0, final_wait_time: int = 0) -> None:
 
 
 def gen_chars(amount: int = 10) -> str:
+    """
+    Generate a random alphanumeric string.
+
+    :param amount: Number of characters to generate.
+    :type amount: int
+    :return: A random string made of letters and digits.
+    :rtype: str
+    """
     chars = ascii_letters + digits
     return "".join(sample(chars, amount))
 
 
 def gen_nbr(amount: int = 2) -> str:
+    """
+    Generate a random string of digits.
+
+    :param amount: Number of digits to generate.
+    :type amount: int
+    :return: A random string made of digits only.
+    :rtype: str
+    """
     return "".join(sample(digits, amount))
 
 
@@ -75,7 +95,7 @@ def there_is_alpha(text: str) -> bool:
     return False
 
 
-def split_by(text: str, chunk_len: int = 0, chunk: int = 2) -> list:
+def split_by(text: str, chunk_len: int = 0, chunk: int = 2) -> list[str | int]:
     """
     Split a string into chunks of a fixed size.
 
@@ -94,7 +114,7 @@ def split_by(text: str, chunk_len: int = 0, chunk: int = 2) -> list:
     if chunk_len == 0:
         chunk_len = int(len(text) / chunk)
     cnt = 0
-    ret = []
+    ret: list[str | int] = []
     i = 0
     e = chunk_len
     while cnt != chunk:

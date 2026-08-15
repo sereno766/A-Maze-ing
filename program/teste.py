@@ -4,9 +4,9 @@ from a_maze_ing import Settings, Maze
 
 def main() -> None:
     settings = Settings(
-        width=5, height=5,
+        width=20, height=20,
         entry=(0, 0), exit=(4, 4),
-        output="maze.txt", seed="abc123", perfect=True
+        output="maze.txt", seed="abc123", perfect=False
     )
     random.seed(settings.seed)
     maze = Maze(settings)
@@ -30,6 +30,16 @@ def main() -> None:
 
     print("\n=== Células nunca visitadas (deveria ser vazio) ===")
     print(intocadas)
+
+    print("\n=== Caminho mais curto (entry -> exit) ===")
+    caminho = maze.representation.find_shortest_path()
+    print("".join(caminho))
+    print(f"Total de passos: {len(caminho)}")
+
+    print(f"\n=== Escrevendo arquivo de saída: {settings.output} ===")
+    maze.representation.write_output_file()
+    with open(settings.output) as f:
+        print(f.read())
 
 
 if __name__ == "__main__":
