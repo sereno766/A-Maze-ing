@@ -9,6 +9,7 @@ from a_maze_ing.src.runner import Runner
 from a_maze_ing.src.cell import Cell
 from a_maze_ing.src.maze import Maze
 from a_maze_ing.src.shell import Shell
+from a_maze_ing.src.render import Render
 
 
 __all__ = [

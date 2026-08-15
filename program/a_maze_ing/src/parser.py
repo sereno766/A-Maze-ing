@@ -140,24 +140,33 @@ def agc() -> dict:
     """
     width = gen_size(min=15, max=25)
     height = gen_size(min=15, max=20)
-    entry = split_by(gen_nbr(2), 1, 2)
-    exit = split_by(gen_nbr(4), 0, 2)
-    valid = False
-    while not valid:
-        if ((int(exit[0]) >= width or int(exit[0]) >= height)
-           or (int(exit[1]) >= width or int(exit[1]) >= height)):
-            exit = split_by(gen_nbr(4), 0, 2)
-        else:
-            valid = True
+    
+    # Gera entrada aleatória
+    entry_x = int(gen_nbr(2)) % width
+    entry_y = int(gen_nbr(2)) % height
+    entry = (entry_x, entry_y)  # <-- TUPLA, não string!
+    
+    # Gera saída aleatória (diferente da entrada)
+    exit_x = int(gen_nbr(4)) % width
+    exit_y = int(gen_nbr(4)) % height
+    exit_ = (exit_x, exit_y)  # <-- TUPLA, não string!
+    
+    # Garante que entrada e saída são diferentes
+    while exit_ == entry:
+        exit_x = int(gen_nbr(4)) % width
+        exit_y = int(gen_nbr(4)) % height
+        exit_ = (exit_x, exit_y)
+    
     seed = gen_seed(20)
+    
     return dict(
         WIDTH=width,
         HEIGHT=height,
-        ENTRY=entry,
-        EXIT=exit,
+        ENTRY=entry,      # <-- Agora é tupla
+        EXIT=exit_,       # <-- Agora é tupla
         OUTPUT_FILE="maze.txt",
         SEED=seed,
-        PERFECT=True
+        PERFECT=False
     )
 
 
@@ -336,7 +345,8 @@ def parser_file(fpath: Path | None = None) -> Settings:
         if validate_file(fpath):
             settings = parser_settings(fpath)
     else:
-        settings = agc()
+        raise SystemError("Missing config.txt")
+        # settings = agc()
     validate_dimensions(settings)
     validate_settings(settings)
     return Settings(

@@ -29,6 +29,8 @@ class Runner:
         maze.representation.write_output_file()
         ret = {
             "maze_grid": maze.representation.return_maze_grid(),
-            "maze_path": maze.representation.path_out
+            "maze_path": maze.representation.path_out,
+            "entry": maze.representation.settings.entry,
+            "exit": maze.representation.settings.exit
         }
         return ret

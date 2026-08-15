@@ -164,14 +164,6 @@ class Maze:
                 if self.is_valid_pos(x, y):
                     self.get_cell(x, y).is_42 = True
 
-        def wall_to_binary(self, walls: int) -> str:
-            return "".join([
-                "1" if walls & self.N else "0",
-                "1" if walls & self.E else "0",
-                "1" if walls & self.S else "0",
-                "1" if walls & self.W else "0",
-                ])
-
         def get_hexbit(self, cell: Cell) -> str:
             if cell.is_42:
                 return "F"
