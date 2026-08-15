@@ -5,6 +5,7 @@ import random
 
 from a_maze_ing import is_even
 
+
 class Maze:
     """Top-level, reusable maze object.
 
@@ -137,15 +138,15 @@ class Maze:
             return [n, s, e, w]
 
         @staticmethod
-        def get_coords(init_x: int, init_y: int) -> list[tuple]:
+        def get_coords(init_x: int, init_y: int) -> list[tuple[int, int]]:
             mapped = [
                     (0, 0), (0, 4), (0, 5), (0, 6),
                     (1, 0), (1, 6),
-                    (2, 0), (2, 1), (2, 2), (2, 4), (2, 5), (2,6),
+                    (2, 0), (2, 1), (2, 2), (2, 4), (2, 5), (2, 6),
                     (3, 2), (3, 4),
                     (4, 2), (4, 4), (4, 5), (4, 6)
                     ]
-            coords = list()
+            coords: list[tuple[int, int]] = []
             for y, x in mapped:
                 tup = (init_y + y, init_x + x)
                 coords.append(tup)
@@ -163,7 +164,7 @@ class Maze:
                 if self.is_valid_pos(x, y):
                     self.get_cell(x, y).is_42 = True
 
-        def wall_to_binary(self, walls: int) -> str: #REMOVE
+        def wall_to_binary(self, walls: int) -> str:
             return "".join([
                 "1" if walls & self.N else "0",
                 "1" if walls & self.E else "0",
@@ -322,14 +323,13 @@ class Maze:
                 file.write(f"{exit_x},{exit_y}\n")
                 file.write(f"{path}\n")
 
-        def return_maze_grid(self) -> list:
-            maze_grid = []
+        def return_maze_grid(self) -> list[int | str]:
+            maze_grid: list[int | str] = []
             for row in self.grid:
                 for cell in row:
                     maze_grid.append(cell.walls)
                 maze_grid.append("\n")
             return maze_grid
-
 
     class MazeGenerator:
         """Carves a maze into a given :class:`MazeRepresentation`.
@@ -340,7 +340,7 @@ class Maze:
         for the non-perfect (Pac-Man-style) mode.
         """
 
-        def __init__(self, representation) -> None:
+        def __init__(self, representation: "Maze.MazeRepresentation") -> None:
             """Store the representation this generator will carve into.
 
             Args:
@@ -364,7 +364,7 @@ class Maze:
             if not rep.settings.perfect:
                 self._add_loops(rep, min_loops=2)
 
-        def _carve_perfect_maze(self, rep) -> None:
+        def _carve_perfect_maze(self, rep: "Maze.MazeRepresentation") -> None:
             """Carve a perfect maze using a randomized recursive backtracker.
 
             Args:
@@ -395,7 +395,9 @@ class Maze:
                 else:
                     stack.pop()
 
-        def _add_loops(self, rep, min_loops: int) -> None:
+        def _add_loops(
+            self, rep: "Maze.MazeRepresentation", min_loops: int
+        ) -> None:
             """Reduce dead-ends and add extra loops to a perfect maze.
 
             Finds dead-end cells (only one open wall) and tries to
@@ -450,7 +452,9 @@ class Maze:
             return 4 - bin(walls).count("1")
 
         @staticmethod
-        def _already_connected(rep, cell_a: Cell, cell_b: Cell) -> bool:
+        def _already_connected(
+            rep: "Maze.MazeRepresentation", cell_a: Cell, cell_b: Cell
+        ) -> bool:
             """Check whether two adjacent cells already have an open wall.
 
             Args:

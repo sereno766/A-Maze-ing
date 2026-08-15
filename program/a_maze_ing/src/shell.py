@@ -1,10 +1,11 @@
+from typing import Any
 from a_maze_ing.src.runner import Runner
 from a_maze_ing.includes.includes import clear
 from pathlib import Path
 from a_maze_ing.includes.includes import GREEN, WHITE, BOLD, DEFAULT, RED
 
 OPTIONS = """1.  Re-generate a new maze
-2.  Show or hide the shortest path 
+2.  Show or hide the shortest path
 3.  Change colors
 4.  Quit"""
 
@@ -15,41 +16,47 @@ checks = [
     "is not valid!"
 ]
 
-class Shell:
-    def __init__(self):
-        self.runner = Runner()
-        self.fpath: Path
 
-    def init_shell(self, fpath: Path = None):
+class Shell:
+    def __init__(self) -> None:
+        self.runner = Runner()
+        self.fpath: Path | None = None
+
+    def init_shell(self, fpath: Path | None = None) -> None:
         print("shell initiated!")
         self.fpath = fpath
 
-    def get_maze_info(self, maze_info: dict):
+    def get_maze_info(
+        self, maze_info: dict[str, Any]
+    ) -> tuple[Any, Any]:
         maze = maze_info.get("maze_grid")
         path = maze_info.get("maze_path")
         return maze, path
 
-    def shell(self):
+    def shell(self) -> None:
         print("shell opened")
-        cmd = 1
+        cmd: int | None = 1
         while True:
             try:
                 match cmd:
                     case 1:
                         clear()
                         try:
-                            maze_info = self.runner.run(self.fpath if self.fpath else None)
+                            fpath = self.fpath if self.fpath else None
+                            maze_info = self.runner.run(fpath)
                             maze, path = self.get_maze_info(maze_info)
                             if not maze:
                                 continue
                             for i in maze:
-                                print(f"[{'0' if len(str(i)) == 1 else ''}{i}]" if i != '\n' else '\n', end='')
+                                pad = '0' if len(str(i)) == 1 else ''
+                                cell = f"[{pad}{i}]"
+                                print(cell if i != '\n' else '\n', end='')
                         except Exception as e:
                             print(f"{RED}Error: {e}{DEFAULT}")
                     case 2:
                         clear()
                         print("path")
-                    case 3: #color 1 - 6
+                    case 3:  # color 1 - 6
                         clear()
                         print("color")
                     case 4:

@@ -1,4 +1,5 @@
 import random
+from typing import Any
 from a_maze_ing.src.parser import parser_file
 from a_maze_ing.src.maze import Maze
 from pathlib import Path
@@ -7,10 +8,10 @@ from pathlib import Path
 class Runner:
     """Runs the full pipeline: parse config, generate, write output."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         pass
 
-    def run(self, fpath: Path = None) -> dict:
+    def run(self, fpath: Path | None = None) -> dict[str, Any]:
         """Parse, generate and write a maze, then return its info.
 
         Args:

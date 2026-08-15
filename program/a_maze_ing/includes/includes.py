@@ -16,6 +16,7 @@ WHITE = "\033[1;37m"
 INVERT = "\033[1;4;7;97m"
 BOLD = "\033[1m"
 
+
 def is_even(nbr: int) -> bool:
     return nbr % 2 == 0
 
@@ -94,7 +95,7 @@ def there_is_alpha(text: str) -> bool:
     return False
 
 
-def split_by(text: str, chunk_len: int = 0, chunk: int = 2) -> list:
+def split_by(text: str, chunk_len: int = 0, chunk: int = 2) -> list[str | int]:
     """
     Split a string into chunks of a fixed size.
 
@@ -113,7 +114,7 @@ def split_by(text: str, chunk_len: int = 0, chunk: int = 2) -> list:
     if chunk_len == 0:
         chunk_len = int(len(text) / chunk)
     cnt = 0
-    ret = []
+    ret: list[str | int] = []
     i = 0
     e = chunk_len
     while cnt != chunk:
