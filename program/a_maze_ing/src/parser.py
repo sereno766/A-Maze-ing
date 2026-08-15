@@ -3,7 +3,7 @@ from pathlib import Path
 from dataclasses import dataclass
 from typing import Any, cast
 from a_maze_ing.src.seed import validate_seed, gen_seed
-from a_maze_ing.includes.includes import gen_nbr, split_by
+from a_maze_ing.includes.includes import gen_nbr
 
 
 def parse_coord(value: str) -> tuple[int, int]:
@@ -140,25 +140,25 @@ def agc() -> dict:
     """
     width = gen_size(min=15, max=25)
     height = gen_size(min=15, max=20)
-    
+
     # Gera entrada aleatória
     entry_x = int(gen_nbr(2)) % width
     entry_y = int(gen_nbr(2)) % height
     entry = (entry_x, entry_y)  # <-- TUPLA, não string!
-    
+
     # Gera saída aleatória (diferente da entrada)
     exit_x = int(gen_nbr(4)) % width
     exit_y = int(gen_nbr(4)) % height
     exit_ = (exit_x, exit_y)  # <-- TUPLA, não string!
-    
+
     # Garante que entrada e saída são diferentes
     while exit_ == entry:
         exit_x = int(gen_nbr(4)) % width
         exit_y = int(gen_nbr(4)) % height
         exit_ = (exit_x, exit_y)
-    
+
     seed = gen_seed(20)
-    
+
     return dict(
         WIDTH=width,
         HEIGHT=height,

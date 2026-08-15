@@ -29,12 +29,12 @@ run:
 debug:
 
 lint:
-	@$(FK) .
-	@$(MP) --warn-return-any --warn-unused-ignores --ignore-missing-imports --disallow-untyped-defs --check-untyped-defs .
+	@$(FK) --exclude=venv .
+	@$(MP) --exclude venv --warn-return-any --warn-unused-ignores --ignore-missing-imports --disallow-untyped-defs --check-untyped-defs .
 
 lint-strict:
-	@$(FK) .
-	@$(MP) --strict .
+	@$(FK) --exclude=venv .
+	@$(MP) --exclude venv --strict .
 
 init-venv:
 	@python -m venv venv --copies

@@ -5,7 +5,6 @@ from pathlib import Path
 from a_maze_ing.includes.includes import GREEN, WHITE, BOLD, DEFAULT, RED
 from a_maze_ing.includes.includes import YLOW, PINK, BLUE, CYAN
 from a_maze_ing.src.render import Render
-from sys import exit
 
 OPTIONS = """1.  Re-generate a new maze
 2.  Show or hide the shortest path
@@ -23,22 +22,25 @@ checks = [
 UNKNOWN_ERR = "Error: unknown erro on creating maze"
 NO_MAZE = "No maze generated yet. Use option 1 to generate one."
 
+
 class Shell:
     def __init__(self) -> None:
         self.runner = Runner()
         self.render = Render()
-        self.fpath: Path
+        self.fpath: Path | None = None
 
     def init_shell(self, fpath: Path | None = None) -> None:
         print("shell initiated!")
         self.fpath = fpath
 
-    def get_info(self, maze_info: dict):
-        maze = maze_info.get("maze_grid")
-        path = maze_info.get("maze_path")
-        entry = maze_info.get("entry")
-        exit = maze_info.get("exit")
-        return maze, path, entry, exit
+    def get_info(
+        self, maze_info: dict[str, Any]
+    ) -> tuple[list, str, tuple[int, int], tuple[int, int]]:
+        maze = maze_info["maze_grid"]
+        path = maze_info["maze_path"]
+        entry = maze_info["entry"]
+        exit_ = maze_info["exit"]
+        return maze, path, entry, exit_
 
     @staticmethod
     def colorize(color_code: int) -> tuple[int, str, str, str]:
@@ -61,9 +63,9 @@ class Shell:
             color_code = 0
         else:
             color_code += 1
-        nw_maze_c = maze_colors.get(color_code)
-        nw_path_c = path_colors.get(color_code)
-        nw_ftp_c = ftp_colors.get(color_code)
+        nw_maze_c = maze_colors[color_code]
+        nw_path_c = path_colors[color_code]
+        nw_ftp_c = ftp_colors[color_code]
         return color_code, nw_maze_c, nw_path_c, nw_ftp_c
 
     @staticmethod
@@ -91,7 +93,7 @@ class Shell:
                 except ValueError:
                     clear()
                     print(f"{RED}Choice is not an integer!{DEFAULT}")
-                    return
+                    continue
             first_run = False
             match cmd:
                 case 1:
@@ -108,16 +110,11 @@ class Shell:
                                 print(f"{RED}Error: {error_msg}{DEFAULT}")
                                 is_known_error = True
                         if not is_known_error:
-                            print(
-                            f"{RED}{UNKNOWN_ERR}{DEFAULT}"
-                            )
+                            print(f"{RED}{UNKNOWN_ERR}{DEFAULT}")
                         continue
-                    maze, m_path, m_entry, m_exit = self.get_info(
-                        maze_info
-                        )
-                    print(maze)
+                    maze, m_path, m_entry, m_exit = self.get_info(maze_info)
                     self.render.get_info(c_maze, c_path, c_ftp, maze,
-                                            m_entry, m_exit, m_path)
+                                         m_entry, m_exit, m_path)
                 case 2:
                     clear()
                     try:
@@ -127,6 +124,10 @@ class Shell:
                         print(f"{RED}Error rendering maze!{DEFAULT}")
                 case 3:
                     clear()
+                    if (maze is None or m_entry is None
+                            or m_exit is None or m_path is None):
+                        print(f"{RED}{NO_MAZE}{DEFAULT}")
+                        continue
                     try:
                         c_code, c_maze, c_path, c_ftp = self.colorize(c_code)
                         self.render.get_info(c_maze, c_path, c_ftp, maze,

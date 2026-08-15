@@ -1,13 +1,16 @@
 from a_maze_ing.includes.includes import DEFAULT, RED, GREEN, clear
 
+
 class Render:
-    def __init__(self):
-        self.maze_c: str
-        self.path_c: str
-        self.ftp_c: str
+    def __init__(self) -> None:
+        self.c_maze: str
+        self.c_path: str
+        self.c_ftp: str
+        self.c_exit: str
+        self.c_entry: str
         self.maze_grid: list
-        self.entry: tuple
-        self.exit: tuple
+        self.entry: tuple[int, int]
+        self.exit: tuple[int, int]
         self.path: str
         self.maze: str
         self.maze_wpath: str
@@ -18,7 +21,8 @@ class Render:
     }
 
     def get_info(self, c_maze: str, c_path: str, c_ftp: str, maze_grid: list,
-                 entry: tuple, exit: tuple, path: str) -> None:
+                 entry: tuple[int, int], exit: tuple[int, int],
+                 path: str) -> None:
         self.c_maze = c_maze
         self.c_path = c_path
         self.c_ftp = c_ftp
@@ -29,6 +33,12 @@ class Render:
         self.exit = exit
         self.path = path
         self.render_maze()
+
+    @staticmethod
+    def _to_row_col(xy: tuple[int, int]) -> tuple[int, int]:
+        """Convert a Settings-style (x, y) coordinate to (row, col)."""
+        x, y = xy
+        return y, x
 
     def binary_to_wall(self, cell_nbr: int) -> str:
         return "".join([
@@ -42,7 +52,7 @@ class Render:
         """Transforma a lista plana (com '\n' como separador de linha) em
         uma lista de listas de códigos de parede (string N/E/S/W)."""
         rows = []
-        current = []
+        current: list = []
         for item in self.maze_grid:
             if item == "\n":
                 rows.append(current)
@@ -57,7 +67,7 @@ class Render:
         """Anda a partir de self.entry seguindo self.path (N/E/S/W)
         e devolve o conjunto de células (linha, coluna) do caminho."""
         moves = {"N": (-1, 0), "S": (1, 0), "E": (0, 1), "W": (0, -1)}
-        pos = tuple(self.entry)
+        pos = self._to_row_col(self.entry)
         cells = {pos}
         for step in self.path:
             dr, dc = moves.get(step, (0, 0))
@@ -80,7 +90,8 @@ class Render:
         height, width = n_rows * 2 + 1, n_cols * 2 + 1
         canvas = self._init_canvas(height, width)
         colors = self._get_colors()
-        entry, exit_ = tuple(self.entry), tuple(self.exit)
+        entry = self._to_row_col(self.entry)
+        exit_ = self._to_row_col(self.exit)
         path_cells = self._path_cells() if with_path else set()
         self._draw_normal_cells(canvas, rows, entry, exit_,
                                 path_cells, colors, with_path)
@@ -106,9 +117,9 @@ class Render:
             'exit': self.c_exit,
         }
 
-    def _draw_normal_cells(self, canvas: list, rows: list, entry: tuple, 
-                        exit_: tuple, path_cells: set, colors: dict, 
-                        with_path: bool) -> None:
+    def _draw_normal_cells(self, canvas: list, rows: list, entry: tuple,
+                           exit_: tuple, path_cells: set, colors: dict,
+                           with_path: bool) -> None:
         """Desenha todas as células que NÃO são 15"""
         n_rows, n_cols = len(rows), len(rows[0])
         space, wall = colors['space'], colors['wall']
@@ -116,7 +127,7 @@ class Render:
             for c in range(n_cols):
                 walls = rows[r][c]
                 if walls == "NESW":
-                    continue 
+                    continue
                 cy, cx = 2 * r + 1, 2 * c + 1
                 is_path = (r, c) in path_cells
                 is_entry = (r, c) == entry
@@ -147,8 +158,8 @@ class Render:
                         for dc in [-1, 0, 1]:
                             canvas[cy + dr][cx + dc] = ftp
 
-    def _draw_path(self, canvas: list, rows: list, entry: tuple, 
-                exit_: tuple, path_cells: set, colors: dict) -> None:
+    def _draw_path(self, canvas: list, rows: list, entry: tuple,
+                   exit_: tuple, path_cells: set, colors: dict) -> None:
         """Desenha o caminho mais curto"""
         n_rows, n_cols = len(rows), len(rows[0])
         path = colors['path']
@@ -162,20 +173,20 @@ class Render:
             if (r, c) != entry and (r, c) != exit_:
                 canvas[cy][cx] = path
             if ((r, c + 1) in path_cells
-                and c + 1 < n_cols
-                and "E" not in walls):
+                    and c + 1 < n_cols
+                    and "E" not in walls):
                 canvas[cy][cx + 1] = path
             if ((r, c - 1) in path_cells
-                and c - 1 >= 0
-                and "W" not in walls):
+                    and c - 1 >= 0
+                    and "W" not in walls):
                 canvas[cy][cx - 1] = path
             if ((r + 1, c) in path_cells
-                and r + 1 < n_rows
-                and "S" not in walls):
+                    and r + 1 < n_rows
+                    and "S" not in walls):
                 canvas[cy + 1][cx] = path
             if ((r - 1, c) in path_cells
-                and r - 1 >= 0
-                and "N" not in walls):
+                    and r - 1 >= 0
+                    and "N" not in walls):
                 canvas[cy - 1][cx] = path
 
     def _draw_border(self, canvas: list, colors: dict) -> None:

@@ -18,5 +18,5 @@ __all__ = [
     "DEFAULT", "RED", "GREEN", "YLOW", "PINK", "CYAN", "INVERT", "BOLD",
     "parser_file", "config_file", "Settings",
     "validate_seed", "gen_seed",
-    "Runner", "Cell", "Maze", "Shell"
+    "Runner", "Cell", "Maze", "Shell", "Render"
 ]
