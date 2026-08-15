@@ -16,7 +16,8 @@ checks = [
     "Unknown setting",
     "Missing settings:",
     "is not valid!",
-    "Missing config.txt"
+    "Missing config.txt",
+    "cannot be in the 42 pattern"
 ]
 
 UNKNOWN_ERR = "Error: unknown erro on creating maze"
@@ -137,7 +138,7 @@ class Shell:
                         print(f"{RED}Error rendering maze!{DEFAULT}")
                 case 4:
                     clear()
-                    print("exiting")
+                    print("Exiting render shell...")
                     break
                 case _:
                     clear()

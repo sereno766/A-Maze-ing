@@ -158,6 +158,12 @@ class Maze:
             init_ft_y = int((self.height / 2 - 3) if is_even(self.height)
                             else ((self.height - 1) / 2 - 2))
             ft_coords = self.get_coords(init_ft_x, init_ft_y)
+            for tup in ft_coords:
+                if self.settings.entry == tup:
+                    raise SystemError("Entry cannot be in the 42 pattern")
+            for tup in ft_coords:
+                if self.settings.exit == tup:
+                    raise SystemError("Exit cannot be in the 42 pattern")
             if self.width <= 12 or self.height <= 12:
                 return
             for y, x in ft_coords:

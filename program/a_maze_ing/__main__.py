@@ -37,9 +37,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     main()
-    import random
-    print(
-        random.choice(["-L-", "-O-", "-N-", "-S-"]),
-        random.choice(["-L-", "-O-", "-N-", "-S-"]),
-        random.choice(["-L-", "-O-", "-N-", "-S-"])
-    )

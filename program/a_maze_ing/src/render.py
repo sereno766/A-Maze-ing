@@ -15,11 +15,6 @@ class Render:
         self.maze: str
         self.maze_wpath: str
 
-    visual_base = {
-        1: "█",
-        2: " "
-    }
-
     def get_info(self, c_maze: str, c_path: str, c_ftp: str, maze_grid: list,
                  entry: tuple[int, int], exit: tuple[int, int],
                  path: str) -> None:
@@ -36,7 +31,6 @@ class Render:
 
     @staticmethod
     def _to_row_col(xy: tuple[int, int]) -> tuple[int, int]:
-        """Convert a Settings-style (x, y) coordinate to (row, col)."""
         x, y = xy
         return y, x
 
@@ -49,8 +43,6 @@ class Render:
         ])
 
     def _grid_rows(self) -> list:
-        """Transforma a lista plana (com '\n' como separador de linha) em
-        uma lista de listas de códigos de parede (string N/E/S/W)."""
         rows = []
         current: list = []
         for item in self.maze_grid:
@@ -64,8 +56,6 @@ class Render:
         return rows
 
     def _path_cells(self) -> set:
-        """Anda a partir de self.entry seguindo self.path (N/E/S/W)
-        e devolve o conjunto de células (linha, coluna) do caminho."""
         moves = {"N": (-1, 0), "S": (1, 0), "E": (0, 1), "W": (0, -1)}
         pos = self._to_row_col(self.entry)
         cells = {pos}
@@ -77,15 +67,14 @@ class Render:
 
     def render_cell(self, render_path: bool, path_type: int) -> str:
         if not render_path:
-            return self.visual_base[2]
+            return " "
         if path_type == 0:
-            return f"{self.c_entry}{self.visual_base[1]}{DEFAULT}"
+            return f"{self.c_entry}█{DEFAULT}"
         if path_type == 1:
-            return f"{self.c_exit}{self.visual_base[1]}{DEFAULT}"
-        return f"{self.c_path}{self.visual_base[1]}{DEFAULT}"
+            return f"{self.c_exit}█{DEFAULT}"
+        return f"{self.c_path}█{DEFAULT}"
 
     def _draw(self, rows: list, with_path: bool) -> str:
-        """Método principal que orquestra o desenho"""
         n_rows, n_cols = len(rows), len(rows[0]) if rows else 0
         height, width = n_rows * 2 + 1, n_cols * 2 + 1
         canvas = self._init_canvas(height, width)
@@ -102,17 +91,15 @@ class Render:
         return "\n".join("".join(row) for row in canvas)
 
     def _init_canvas(self, height: int, width: int) -> list:
-        """Inicializa o canvas com paredes"""
-        wall = f"{self.c_maze}{self.visual_base[1]}{DEFAULT}"
+        wall = f"{self.c_maze}█{DEFAULT}"
         return [[wall for _ in range(width)] for _ in range(height)]
 
     def _get_colors(self) -> dict:
-        """Retorna um dicionário com todas as cores"""
         return {
-            'wall': f"{self.c_maze}{self.visual_base[1]}{DEFAULT}",
-            'path': f"{self.c_path}{self.visual_base[1]}{DEFAULT}",
-            'ftp': f"{self.c_ftp}{self.visual_base[1]}{DEFAULT}",
-            'space': self.visual_base[2],
+            'wall': f"{self.c_maze}█{DEFAULT}",
+            'path': f"{self.c_path}█{DEFAULT}",
+            'ftp': f"{self.c_ftp}█{DEFAULT}",
+            'space': " ",
             'entry': self.c_entry,
             'exit': self.c_exit,
         }
@@ -120,7 +107,6 @@ class Render:
     def _draw_normal_cells(self, canvas: list, rows: list, entry: tuple,
                            exit_: tuple, path_cells: set, colors: dict,
                            with_path: bool) -> None:
-        """Desenha todas as células que NÃO são 15"""
         n_rows, n_cols = len(rows), len(rows[0])
         space, wall = colors['space'], colors['wall']
         for r in range(n_rows):
@@ -147,7 +133,6 @@ class Render:
 
     def _draw_pattern_cells(self, canvas: list,
                             rows: list, colors: dict) -> None:
-        """Desenha as células 15 (padrão 42) - bloco 3x3 inteiro"""
         n_rows, n_cols = len(rows), len(rows[0])
         ftp = colors['ftp']
         for r in range(n_rows):
@@ -160,7 +145,6 @@ class Render:
 
     def _draw_path(self, canvas: list, rows: list, entry: tuple,
                    exit_: tuple, path_cells: set, colors: dict) -> None:
-        """Desenha o caminho mais curto"""
         n_rows, n_cols = len(rows), len(rows[0])
         path = colors['path']
         for r, c in path_cells:
@@ -190,9 +174,8 @@ class Render:
                 canvas[cy - 1][cx] = path
 
     def _draw_border(self, canvas: list, colors: dict) -> None:
-        """Desenha a borda decorativa"""
         height, width = len(canvas), len(canvas[0])
-        frame = colors['ftp']
+        frame = colors['wall']
         for x in range(width):
             canvas[0][x] = frame
             canvas[height - 1][x] = frame
@@ -215,4 +198,3 @@ class Render:
             print(self.maze_wpath)
         else:
             print(self.maze)
-        print(self.path)
