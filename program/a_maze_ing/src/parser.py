@@ -69,7 +69,7 @@ class Settings:
     perfect: bool
 
 
-def validate_dimensions(settings: dict) -> None:
+def validate_dimensions(settings: dict[str, Any]) -> None:
     """Validate width/height/entry/exit consistency of a raw settings dict.
 
     Args:
@@ -128,7 +128,7 @@ def gen_size(min: int, max: int) -> int:
     return size
 
 
-def agc() -> dict:
+def agc() -> dict[str, Any]:
     """Auto-generate a random, valid configuration.
 
     Used when the program is run without a config file, as a
@@ -227,7 +227,7 @@ def parser_settings(path: Path) -> dict[str, object]:
     return settings
 
 
-def validate_settings(settings: dict) -> None:
+def validate_settings(settings: dict[str, Any]) -> None:
     """Validate that every mandatory key is present, and resolve the seed.
 
     If the SEED key was not provided, a new one is generated and
@@ -256,6 +256,15 @@ def validate_settings(settings: dict) -> None:
 
 
 def file_is_empty(path: Path) -> bool:
+    """Check whether a config file has no non-blank content.
+
+    Args:
+        path: Path to the config.txt file.
+
+    Returns:
+        True if every line is empty, False as soon as a non-empty
+        line is found.
+    """
     with path.open() as file:
         for line in file:
             if line != "":
@@ -264,6 +273,23 @@ def file_is_empty(path: Path) -> bool:
 
 
 def validate_values(path: Path) -> bool:
+    """Check that every recognised `KEY=VALUE` line has a well-formed value.
+
+    Validates the raw string format of each value (e.g. `WIDTH` must
+    parse as `int`, `ENTRY`/`EXIT` as `X,Y`, `PERFECT` as
+    `True`/`False`) directly against the file, ahead of the actual
+    type conversion done by `parser_settings`.
+
+    Args:
+        path: Path to the config.txt file.
+
+    Returns:
+        True once every line has been checked without error.
+
+    Raises:
+        ValueError: If any key's value does not match its expected
+            format.
+    """
     with path.open() as file:
         for line in file:
             line = line.strip()
@@ -306,6 +332,22 @@ def validate_values(path: Path) -> bool:
 
 
 def validate_file(path: Path) -> bool:
+    """Validate a config file's structure: keys present, no extras, no gaps.
+
+    Checks that every `KEY=VALUE` line names a recognised key, that
+    no mandatory key is missing (SEED is the only optional one), and
+    then delegates to `validate_values` for per-value format checks.
+
+    Args:
+        path: Path to the config.txt file.
+
+    Returns:
+        True if the file is structurally and semantically valid.
+
+    Raises:
+        ValueError: If a line has an unknown key, a missing value,
+            or a mandatory key is absent from the file.
+    """
     settings_in_file = []
     valid_settings = ["WIDTH", "HEIGHT", "ENTRY", "EXIT",
                       "OUTPUT_FILE", "PERFECT", "SEED"]

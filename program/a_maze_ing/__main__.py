@@ -21,6 +21,12 @@ import argparse
 #     return 0
 
 def main() -> int:
+    """Parse CLI arguments and hand control to the interactive shell.
+
+    Returns:
+        Process exit code (always 0; the shell handles its own
+        errors internally).
+    """
     parser = argparse.ArgumentParser()
     parser.add_argument("config", nargs="?", type=config_file,
                         help="Maze configuration file")

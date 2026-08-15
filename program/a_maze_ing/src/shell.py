@@ -11,32 +11,45 @@ OPTIONS = """1.  Re-generate a new maze
 3.  Change colors
 4.  Quit"""
 
-checks = [
-    "invalid line:",
-    "Unknown setting",
-    "Missing settings:",
-    "is not valid!",
-    "Missing config.txt",
-    "cannot be in the 42 pattern"
-]
-
-UNKNOWN_ERR = "Error: unknown erro on creating maze"
 NO_MAZE = "No maze generated yet. Use option 1 to generate one."
 
 
 class Shell:
+    """Interactive terminal menu driving maze generation and display.
+
+    Ties together `Runner` (parse + generate + write), `Render`
+    (ASCII drawing), and a simple numbered-menu loop offering
+    regeneration, path toggling, and color rotation.
+    """
+
     def __init__(self) -> None:
+        """Create the shell with its own `Runner` and `Render` instances."""
         self.runner = Runner()
         self.render = Render()
         self.fpath: Path | None = None
 
     def init_shell(self, fpath: Path | None = None) -> None:
+        """Record the config file to use for every future generation.
+
+        Args:
+            fpath: Path to the config.txt file, or None to let
+                `Runner`/`parser_file` decide (currently always
+                required -- see `parser_file`).
+        """
         print("shell initiated!")
         self.fpath = fpath
 
     def get_info(
         self, maze_info: dict[str, Any]
-    ) -> tuple[list, str, tuple[int, int], tuple[int, int]]:
+    ) -> tuple[list[int | str], str, tuple[int, int], tuple[int, int]]:
+        """Unpack a `Runner.run` result into its four components.
+
+        Args:
+            maze_info: The dict returned by `Runner.run`.
+
+        Returns:
+            A `(maze_grid, path, entry, exit)` tuple.
+        """
         maze = maze_info["maze_grid"]
         path = maze_info["maze_path"]
         entry = maze_info["entry"]
@@ -45,6 +58,18 @@ class Shell:
 
     @staticmethod
     def colorize(color_code: int) -> tuple[int, str, str, str]:
+        """Advance to the next colour scheme in a fixed 3-way rotation.
+
+        Args:
+            color_code: The current scheme index. Any value outside
+                `[0, 1]` wraps back around to scheme 0 (this also
+                makes the very first call, with an out-of-range
+                "priming" value, resolve to scheme 0).
+
+        Returns:
+            A `(new_code, maze_color, path_color, pattern_color)`
+            tuple for the next scheme in the rotation.
+        """
         maze_colors = {
             0: YLOW,
             1: PINK,
@@ -71,9 +96,24 @@ class Shell:
 
     @staticmethod
     def define_show_path(actual_definition: bool) -> bool:
+        """Toggle the "show shortest path" flag.
+
+        Args:
+            actual_definition: The current flag value.
+
+        Returns:
+            The opposite of `actual_definition`.
+        """
         return False if actual_definition else True
 
     def shell(self) -> None:
+        """Run the interactive menu loop until the user quits.
+
+        Repeatedly prompts for a choice (1: regenerate, 2: toggle
+        path, 3: rotate colors, 4: quit), re-rendering the maze
+        after every action. Never raises -- generation and
+        rendering errors are caught and reported inline.
+        """
         print("shell opened")
         c_code, c_maze, c_path, c_ftp = self.colorize(3)
         cmd = 1
@@ -104,14 +144,7 @@ class Shell:
                             self.fpath if self.fpath else None)
                     except Exception as e:
                         clear()
-                        error_msg = str(e)
-                        is_known_error = False
-                        for error_type in checks:
-                            if error_type in error_msg:
-                                print(f"{RED}Error: {error_msg}{DEFAULT}")
-                                is_known_error = True
-                        if not is_known_error:
-                            print(f"{RED}{UNKNOWN_ERR}{DEFAULT}")
+                        print(f"{RED}Error: {e}{DEFAULT}")
                         continue
                     maze, m_path, m_entry, m_exit = self.get_info(maze_info)
                     self.render.get_info(c_maze, c_path, c_ftp, maze,

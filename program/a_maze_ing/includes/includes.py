@@ -18,6 +18,13 @@ BOLD = "\033[1m"
 
 
 def is_even(nbr: int) -> bool:
+    """Check whether an integer is even.
+
+    :param nbr: The number to check.
+    :type nbr: int
+    :return: True if `nbr` is even, False otherwise.
+    :rtype: bool
+    """
     return nbr % 2 == 0
 
 

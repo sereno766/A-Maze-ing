@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mazegen"
+version = "1.0.0"
+description = "Reusable maze generator: recursive-backtracker, perfect or braided/loopy modes."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+license-files = ["LICENSE.md"]
+authors = [
+    { name = "smachado" },
+    { name = "vgomes-p" },
+]
+
+[tool.setuptools]
+py-modules = ["mazegen"]

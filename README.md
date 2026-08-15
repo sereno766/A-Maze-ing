@@ -10,9 +10,10 @@ grid-based maze (optionally a "perfect" maze with a single path between the
 entry and the exit, or a Pac-Man-style board with multiple independent
 routes), computes the shortest path between the entry and the exit, and
 writes the result to a plain text file using a compact hexadecimal wall
-encoding (one hex digit per cell). The maze generation logic is organized as
-a standalone, reusable module (`Maze`) that can be imported and reused by
-future projects independently of the CLI/config-parsing layer.
+encoding (one hex digit per cell). The maze generation algorithm is also
+packaged separately as **`mazegen`**, a standalone, pip-installable module
+with no dependency on this CLI or its config-parsing layer (see
+[Reusable code](#reusable-code) below).
 
 ## INSTRUCTIONS
 
@@ -23,20 +24,27 @@ future projects independently of the CLI/config-parsing layer.
 ### Setup
 From the `program/` directory:
 ```bash
-make init-venv        # creates the venv (uses python3 under the hood)
-source venv/bin/activate        # bash/zsh
+make install
+# creates the venv (program/venv) and installs dependencies from
+# requirements.txt in one step
+source venv/bin/activate        # bash/zsh, optional
 # or: source venv/bin/activate.fish   (fish shell)
-make depend            # installs dependencies from requirements.txt
 ```
 
 ### Running
 ```bash
 make run
 # equivalent to:
-python -m a_maze_ing config.txt
+venv/bin/python -m a_maze_ing config.txt
 ```
-If no config file is given, a random valid configuration is generated
-automatically.
+`config.txt` is currently required (an explicit config file must be passed).
+
+### Debugging
+```bash
+make debug
+# runs the same entry point under pdb:
+venv/bin/python -m pdb -m a_maze_ing config.txt
+```
 
 ### Linting
 ```bash
@@ -112,52 +120,66 @@ playable Pac-Man-style board.
 
 ## REUSABLE CODE
 
-The maze generation logic lives entirely in `program/a_maze_ing/src/maze.py`
-and `program/a_maze_ing/src/cell.py`, with no dependency on the CLI,
-`argparse`, or the config file parser. It is organized as a single public
-class, `Maze`, wrapping two internal collaborators:
+The maze generation algorithm is packaged separately from the CLI as
+**`mazegen`**, a standalone module at [`mazegen/mazegen.py`](mazegen/mazegen.py),
+with no dependency on `a_maze_ing`, `argparse`, or the config file parser --
+it only needs the Python standard library. It exposes a single public class,
+`MazeGenerator`.
 
-- `Maze.MazeRepresentation`: the grid of `Cell` objects, plus helpers to
-  query/mutate walls, find neighbours, compute the shortest path
-  (`find_shortest_path`), and write the output file (`write_output_file`).
-- `Maze.MazeGenerator`: the generation algorithm itself (`generate`).
+Built as an installable package (`.whl`/`.tar.gz`, see below), it can be
+`pip install`-ed and reused by any future project independently of this
+repository's CLI.
 
 ### Usage example
 
 ```python
-from a_maze_ing import Settings, Maze
+from mazegen import MazeGenerator
 
-settings = Settings(
+gen = MazeGenerator(
     width=20, height=15,
     entry=(0, 0), exit=(19, 14),
-    output="maze.txt", seed="my-seed-123", perfect=False,
+    perfect=False,        # False -> braided/loopy, Pac-Man-style board
+    seed="my-seed-123",   # optional, for reproducible generation
 )
-
-maze = Maze(settings)
-maze.generator.generate()
+gen.generate()
 
 # Access the generated structure directly:
-cell = maze.representation.get_cell(0, 0)
-print(cell.walls)      # 4-bit wall mask (N=1, E=2, S=4, W=8)
+cell = gen.grid[0][0]     # grid[y][x]
+print(cell.walls)         # 4-bit wall mask (N=1, E=2, S=4, W=8)
+print(gen.wall_at(0, 0))  # same thing, via accessor
 
 # Access a solution:
-path = maze.representation.find_shortest_path()   # e.g. ["E", "E", "S", ...]
-
-# Or reuse the same encoding the CLI writes to disk:
-maze.representation.write_output_file()
+path = gen.shortest_path()   # e.g. ["E", "E", "S", ...]
 ```
 
-Custom parameters (size, entry/exit, seed, perfect/non-perfect mode) are all
-passed through the `Settings` dataclass shown above -- no config file is
-required to use the module programmatically.
+Custom parameters (size, entry/exit, seed, perfect/non-perfect mode, and
+whether to reserve the "42" pattern cells) are all passed directly to the
+`MazeGenerator` constructor shown above -- no config file is required.
 
 > Note: the in-memory structure (`Cell.walls`, a 4-bit mask per cell) is not
-> the same format as the output file -- it is converted to a hex digit only
-> when `write_output_file` is called.
+> the same format as `a_maze_ing`'s output file -- it grants direct access
+> to the grid instead.
 
-This module is intended to be packaged separately as an installable
-`mazegen-*` package (`.whl`/`.tar.gz`) at the root of the repository, as
-required for reuse by future projects.
+### Building the package
+
+```bash
+cd mazegen
+python -m pip install build
+python -m build
+# -> dist/mazegen-1.0.0-py3-none-any.whl
+# -> dist/mazegen-1.0.0.tar.gz
+```
+
+The built `mazegen-1.0.0-py3-none-any.whl` and `mazegen-1.0.0.tar.gz` are
+committed at the root of this repository, alongside [`LICENSE.md`](LICENSE.md)
+(MIT), which explicitly allows reuse and distribution by later projects. See
+[`mazegen/README.md`](mazegen/README.md) for the package's own short
+documentation (mirrored from this section).
+
+> The `program/a_maze_ing` CLI currently carries its own, similar internal
+> generation logic (`program/a_maze_ing/src/maze.py`) to drive the
+> interactive shell/renderer -- `mazegen` is the standalone, pip-installable
+> module meant for reuse by future projects.
 
 ## RESOURCES
 
@@ -170,28 +192,66 @@ required for reuse by future projects.
 
 ### How AI was used
 
-An AI assistant (Claude) was used mainly to research and understand
-concepts needed for the project (bitwise operations, BFS, argparse,
-RNG seeding, etc.), and to help write the code documentation -- the
-docstrings across the modules and this README.
+An AI assistant (Claude Code) was used mainly to **consult** on concepts
+needed for the project (bitwise wall encoding, BFS, Python packaging, etc.)
+and to **assist with documentation** -- the PEP 257 docstrings across every
+module and this README. All AI-assisted changes were reviewed, tested, and
+understood by the team before being kept.
 
 ## TEAM AND PROJECT MANAGEMENT
 
 ### Roles
-<!-- TODO: fill in each member's main area of ownership, e.g.:
-- smachado: ...
-- vigomes-...: ...
--->
+- **smachado**: maze generation core -- the recursive-backtracker algorithm
+  (`MazeGenerator`), the `Cell` representation, the BFS shortest-path solver,
+  and the "perfect maze" mode.
+- **vigomes-**: the visual/ASCII rendering layer (`Render`) and the config
+  file parser (`parser.py`).
+- **Both**: everything else -- shell/CLI integration, the interactive menu,
+  lint/type-checking cleanup, the `mazegen` reusable package, and the
+  README -- was shared/paired on.
 
 ### Planning
 Tasks were tracked on a Kanban-style board (Backlog / In Progress),
 broken down per feature (Seed System, Cell representation, Pathfinding,
 Hex encoding/Export, ...), with sub-tasks as checklists on each card.
-<!-- TODO: describe how the plan evolved -- e.g. which estimates changed,
-what got reprioritized, and why. -->
+
+Work started on two parallel branches, `maze_ger` (config parsing, RNG/seed
+handling, generation logic) and `maze_representation` (grid/cell state), each
+merged into `main` independently as they matured. Partway through, the two
+generator-related classes were deliberately refactored into a single `Maze`
+class with nested collaborators (`MazeRepresentation`, `MazeGenerator`),
+specifically to satisfy the "one reusable class" requirement -- the original
+split made sense while iterating, but not as the final public shape. Visual
+rendering (`maze_render` branch) and the interactive shell were planned and
+built last, once generation/output were solid, followed by a final pass
+dedicated to packaging (`mazegen`) and to strict lint/type-checking/docstring
+compliance across the whole codebase.
 
 ### What worked well / what could be improved
-<!-- TODO: short retrospective from the team. -->
+**Worked well:**
+- Splitting work into per-feature branches (`maze_ger`, `maze_representation`,
+  `maze_render`) let generation, state, and rendering evolve independently
+  without blocking each other.
+- Writing `maze_analyzer.py` early, as an independent verification script,
+  caught structural issues (wall coherence, connectivity, loop/dead-end
+  counts) mechanically instead of relying on eyeballing ASCII output.
+
+**Could be improved:**
+- The two early branches modeled coordinates differently (`(x, y)` in
+  `Settings` vs. `(row, col)` internally), and that mismatch resurfaced later
+  as a real bug in the renderer (entry/exit swapped on non-square mazes) --
+  worth agreeing on one convention project-wide from the start.
+- The shell's error display and the parser's validation messages drifted out
+  of sync: a hardcoded whitelist of "known" error substrings in the shell
+  ended up hiding most of the parser's specific, well-written error messages
+  behind a generic "unknown error". Two lists that must stay manually in sync
+  across files is a fragile pattern to avoid.
+- `flake8`/`mypy --strict` compliance and docstrings were treated as a final
+  cleanup pass instead of enforced continuously -- retrofitting ~30 missing
+  docstrings and dozens of type annotations at the end took longer than
+  keeping `make lint` green from each merge onward would have.
+- The Makefile's mandatory `install`/`debug` rules were left as empty stubs
+  for most of the project and were nearly missed entirely.
 
 ### Tools used
 - **Git** (feature branches per component, e.g. `maze_ger`,

@@ -9,6 +9,7 @@ class Runner:
     """Runs the full pipeline: parse config, generate, write output."""
 
     def __init__(self) -> None:
+        """Create a Runner -- stateless, every call to `run` is independent."""
         pass
 
     def run(self, fpath: Path | None = None) -> dict[str, Any]:

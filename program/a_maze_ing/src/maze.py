@@ -139,6 +139,16 @@ class Maze:
 
         @staticmethod
         def get_coords(init_x: int, init_y: int) -> list[tuple[int, int]]:
+            """Compute the grid coordinates of the "42" pattern's cells.
+
+            Args:
+                init_x: Column of the pattern's top-left corner.
+                init_y: Row of the pattern's top-left corner.
+
+            Returns:
+                The (row, col) coordinates of every cell that draws
+                the "42" glyph, offset from (init_x, init_y).
+            """
             mapped = [
                     (0, 0), (0, 4), (0, 5), (0, 6),
                     (1, 0), (1, 6),
@@ -153,6 +163,25 @@ class Maze:
             return coords
 
         def make_pattern(self) -> None:
+            """Reserve the cells that draw the mandatory "42" pattern.
+
+            Marks the pattern's cells as `is_42`, so the generator
+            never carves through them. Centred on the grid; skipped
+            entirely -- with a console message, no cells marked, and
+            no entry/exit collision check -- if the maze is too
+            small to fit it.
+
+            Raises:
+                SystemError: If the pattern would overlap the entry
+                    or the exit cell.
+            """
+            if self.width <= 12 or self.height <= 12:
+                print(
+                    "Warning: maze too small for the '42' pattern "
+                    f"({self.width}x{self.height}, both sides must be "
+                    "> 12); omitting it."
+                )
+                return
             init_ft_x = int((self.width / 2 - 4) if is_even(self.width)
                             else ((self.width - 1) / 2 - 3))
             init_ft_y = int((self.height / 2 - 3) if is_even(self.height)
@@ -164,13 +193,21 @@ class Maze:
             for tup in ft_coords:
                 if self.settings.exit == tup:
                     raise SystemError("Exit cannot be in the 42 pattern")
-            if self.width <= 12 or self.height <= 12:
-                return
             for y, x in ft_coords:
                 if self.is_valid_pos(x, y):
                     self.get_cell(x, y).is_42 = True
 
         def get_hexbit(self, cell: Cell) -> str:
+            """Encode one cell as a single output-file character.
+
+            Args:
+                cell: The cell to encode.
+
+            Returns:
+                "F" for a "42" pattern cell (always fully closed),
+                otherwise the cell's wall mask as one uppercase hex
+                digit.
+            """
             if cell.is_42:
                 return "F"
             return "".join(f"{cell.walls:X}")
@@ -277,7 +314,7 @@ class Maze:
             return False
 
         @staticmethod
-        def _cells_to_directions(cells: list) -> list[str]:
+        def _cells_to_directions(cells: list[Cell]) -> list[str]:
             """Convert a list of consecutive cells into direction letters.
 
             Args:
@@ -322,6 +359,12 @@ class Maze:
                 file.write(f"{path}\n")
 
         def return_maze_grid(self) -> list[int | str]:
+            """Flatten the grid into a list for the interactive shell/renderer.
+
+            Returns:
+                Every cell's raw `walls` bitmask, row by row, with a
+                `"\\n"` string marking the end of each row.
+            """
             maze_grid: list[int | str] = []
             for row in self.grid:
                 for cell in row:
