@@ -128,12 +128,12 @@ class Render:
             `render_path` is False).
         """
         if not render_path:
-            return " "
+            return "  "
         if path_type == 0:
-            return f"{self.c_entry}█{DEFAULT}"
+            return f"{self.c_entry}██{DEFAULT}"
         if path_type == 1:
-            return f"{self.c_exit}█{DEFAULT}"
-        return f"{self.c_path}█{DEFAULT}"
+            return f"{self.c_exit}██{DEFAULT}"
+        return f"{self.c_path}██{DEFAULT}"
 
     def _draw(self, rows: list[list[str]], with_path: bool) -> str:
         """Build the full ASCII drawing of the maze.
@@ -174,7 +174,7 @@ class Render:
             A `height` x `width` grid of the wall glyph, to be
             selectively cleared into corridors by the draw passes.
         """
-        wall = f"{self.c_maze}█{DEFAULT}"
+        wall = f"{self.c_maze}██{DEFAULT}"
         return [[wall for _ in range(width)] for _ in range(height)]
 
     def _get_colors(self) -> dict[str, str]:
@@ -185,10 +185,10 @@ class Render:
             "space", "entry", "exit") to its rendered glyph/color.
         """
         return {
-            'wall': f"{self.c_maze}█{DEFAULT}",
-            'path': f"{self.c_path}█{DEFAULT}",
-            'ftp': f"{self.c_ftp}█{DEFAULT}",
-            'space': " ",
+            'wall': f"{self.c_maze}██{DEFAULT}",
+            'path': f"{self.c_path}██{DEFAULT}",
+            'ftp': f"{self.c_ftp}██{DEFAULT}",
+            'space': "  ",
             'entry': self.c_entry,
             'exit': self.c_exit,
         }
@@ -226,9 +226,9 @@ class Render:
                 is_entry = (r, c) == entry
                 is_exit = (r, c) == exit_
                 if is_entry:
-                    canvas[cy][cx] = f"{colors['entry']}█{DEFAULT}"
+                    canvas[cy][cx] = f"{colors['entry']}██{DEFAULT}"
                 elif is_exit:
-                    canvas[cy][cx] = f"{colors['exit']}█{DEFAULT}"
+                    canvas[cy][cx] = f"{colors['exit']}██{DEFAULT}"
                 elif with_path and is_path:
                     canvas[cy][cx] = colors['path']
                 else:
