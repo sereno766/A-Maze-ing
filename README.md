@@ -1,7 +1,7 @@
 *This project has been created as part of the 42 curriculum by smachado, vigomes-*
 
-# A-MAZE-ING
-*This is the way*
+# A-MAZE-ING | This is the way
+![AMazeIng Working](src/maze.png)
 
 ## DESCRIPTION
 
@@ -14,6 +14,7 @@ encoding (one hex digit per cell). The maze generation algorithm is also
 packaged separately as **`mazegen`**, a standalone, pip-installable module
 with no dependency on this CLI or its config-parsing layer (see
 [Reusable code](#reusable-code) below).
+![Intra Project Approved Image](src/intra.png)
 
 ## INSTRUCTIONS
 
